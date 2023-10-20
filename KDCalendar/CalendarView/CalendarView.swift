@@ -25,6 +25,7 @@
 
 import UIKit
 
+// MARK: CalendarViewDataSource (protocol)
 public protocol CalendarViewDataSource {
     func startDate() -> Date
     func endDate() -> Date
@@ -46,6 +47,7 @@ extension CalendarViewDataSource {
     }
 }
 
+// MARK: - CalendarViewDelegate (protocol)
 public protocol CalendarViewDelegate {
     
     func calendar(_ calendar : CalendarView, didScrollToMonth date : Date) -> Void
@@ -62,12 +64,19 @@ extension CalendarViewDelegate {
     func calendar(_ calendar : CalendarView, didLongPressDate date : Date) -> Void { return }
 }
 
+// MARK: - CalendarView
 public class CalendarView: UIView {
     
-    public let cellReuseIdentifier = "CalendarDayCell"
+    internal let cellReuseIdentifier = "CalendarDayCell"
     
+    // MARK: Subviews
     var headerView: CalendarHeaderView!
     var collectionView: UICollectionView!
+    
+    // MARK: - Public properties
+    
+    public internal(set) var selectedIndexPaths = [IndexPath]()
+    public internal(set) var selectedDates = [Date]()
     
     public var forceLtr: Bool = true {
         didSet {
@@ -94,9 +103,6 @@ public class CalendarView: UIView {
     public var calendar : Calendar {
         return style.calendar
     }
-    
-    public internal(set) var selectedIndexPaths = [IndexPath]()
-    public internal(set) var selectedDates = [Date]()
 
     internal var _startDateCache: Date?
     internal var _endDateCache: Date?
@@ -113,13 +119,12 @@ public class CalendarView: UIView {
         return self.collectionView.collectionViewLayout as! CalendarFlowLayout
     }
     
-    // MARK: - public
-    
     public internal(set) var displayDate: Date?
-    public var multipleSelectionEnable = true
+    public var multipleSelectionEnable = false
     public var enableDeselection = true
     public var marksWeekends = true
     
+    // Delegates
     public var delegate: CalendarViewDelegate?
     public var dataSource: CalendarViewDataSource?
     
@@ -130,18 +135,21 @@ public class CalendarView: UIView {
         }
     }
     
+    // MARK: Life cycle
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.setup()
+        self.setupSubviews()
     }
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        setupSubviews()
     }
     
     override open func awakeFromNib() {
         super.awakeFromNib()
-        self.setup()
+        self.setupSubviews()
     }
     
     public var allowsMultipleSelection: Bool {
@@ -151,49 +159,6 @@ public class CalendarView: UIView {
         get {
             return self.collectionView.allowsMultipleSelection
         }
-    }
-    
-    // MARK: Create Subviews
-    private func setup() {
-        
-        self.clipsToBounds = true
-        self.translatesAutoresizingMaskIntoConstraints = false
-        self.backgroundColor = self.style.commonBackground
-        
-        /* Header View */
-        self.headerView = CalendarHeaderView(frame:CGRect.zero)
-        self.headerView.style = style
-        self.headerView.delegate = self
-        self.addSubview(self.headerView)
-        
-        self.headerView.backgroundColor = .red
-        
-        /* Layout */
-        let layout = CalendarFlowLayout()
-        layout.scrollDirection = self.direction;
-        layout.sectionInset = UIEdgeInsets.zero
-        layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = 0
-
-        /* Collection View */
-        self.collectionView                     = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        self.collectionView.dataSource          = self
-        self.collectionView.delegate            = self
-        self.collectionView.isPagingEnabled     = true
-        self.collectionView.backgroundColor     = UIColor.clear
-        self.collectionView.showsHorizontalScrollIndicator  = false
-        self.collectionView.showsVerticalScrollIndicator    = false
-        self.collectionView.allowsMultipleSelection         = true
-        self.collectionView.register(CalendarDayCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
-        
-        self.addSubview(self.collectionView)
-        
-        // Update semantic content attributes
-        updateLayoutDirections()
-        
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(CalendarView.handleLongPress))
-        self.collectionView.addGestureRecognizer(longPress)
-        
     }
     
     @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
@@ -320,59 +285,14 @@ public class CalendarView: UIView {
 extension CalendarView: CalendarHeaderDelegate {
     func calendarHeaderDidOccurAction(_ action: CalendarHeaderAction) {
         switch action {
-        case .down:
-            break
-        case .up:
-            break
+        case .down, .up:
+            let toogleViewType = self.style.viewType.toogle()
+            self.style.viewType = toogleViewType
         case .left:
-            break
+            handleLeftButtonAction()
         case .right:
-            break
+            handleRightButtonAction()
         }
-    }
-}
-
-// MARK: Convertion
-
-extension CalendarView {
-
-    func indexPathForDate(_ date : Date) -> IndexPath? {
-        
-        let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.firstDayCache, to: date)
-        
-        guard
-            let day   = distanceFromStartDate.day,
-            let month = distanceFromStartDate.month,
-            let (firstDayIndex, _) = getCachedSectionInfo(month) else { return nil }
-        
-        return IndexPath(item: day + firstDayIndex, section: month)
-    }
-    
-    func dateFromIndexPath(_ indexPath: IndexPath) -> Date? {
-        
-        let month = indexPath.section
-        
-        guard let monthInfo = getCachedSectionInfo(month) else { return nil }
-        
-        var components      = DateComponents()
-        components.month    = month
-        components.day      = indexPath.item - monthInfo.firstDay
-        
-        return self.calendar.date(byAdding: components, to: self.firstDayCache)
-    }
-}
-
-extension CalendarView {
-
-    func goToMonthWithOffet(_ offset: Int) {
-        
-        guard let displayDate = self.displayDate else { return }
-        
-        var dateComponents = DateComponents()
-        dateComponents.month = offset
-    
-        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
-        self.setDisplayDate(newDate, animated: true)
     }
 }
 
@@ -466,5 +386,113 @@ extension CalendarView {
         selectedIndexPaths.removeAll()
         selectedDates.removeAll()
         self.reloadData()
+    }
+}
+
+// MARK: - Setup subviews (private)
+private extension CalendarView {
+    func setupSubviews() {
+        
+        self.clipsToBounds = true
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.backgroundColor = self.style.commonBackground
+        
+        /* Header View */
+        self.headerView = CalendarHeaderView(frame:CGRect.zero)
+        self.headerView.style = style
+        self.headerView.delegate = self
+        self.addSubview(self.headerView)
+        
+        self.headerView.backgroundColor = .red
+        
+        /* Layout */
+        let layout = CalendarFlowLayout()
+        layout.scrollDirection = self.direction;
+        layout.sectionInset = UIEdgeInsets.zero
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
+
+        /* Collection View */
+        self.collectionView                     = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        self.collectionView.dataSource          = self
+        self.collectionView.delegate            = self
+        self.collectionView.isPagingEnabled     = true
+        self.collectionView.backgroundColor     = UIColor.clear
+        self.collectionView.showsHorizontalScrollIndicator  = false
+        self.collectionView.showsVerticalScrollIndicator    = false
+        self.collectionView.allowsMultipleSelection         = true
+        self.collectionView.register(CalendarDayCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
+        
+        self.addSubview(self.collectionView)
+        
+        // Update semantic content attributes
+        updateLayoutDirections()
+        
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(CalendarView.handleLongPress))
+        self.collectionView.addGestureRecognizer(longPress)
+        
+    }
+}
+
+// MARK: - Handle left/right header button action (private)
+private extension CalendarView {
+    func handleLeftButtonAction() {
+        switch self.style.viewType {
+        case.month:
+            goToPreviousMonth()
+        case .week:
+            break
+        }
+    }
+    
+    func handleRightButtonAction() {
+        switch self.style.viewType {
+        case .month:
+            goToNextMonth()
+        case .week:
+            break
+        }
+    }
+}
+
+// MARK: - Go to month with offset (private)
+private extension CalendarView {
+    func goToMonthWithOffet(_ offset: Int) {
+        
+        guard let displayDate = self.displayDate else { return }
+        
+        var dateComponents = DateComponents()
+        dateComponents.month = offset
+    
+        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
+        self.setDisplayDate(newDate, animated: true)
+    }
+}
+
+// MARK: Convertions methods (privatye)
+extension CalendarView {
+    func indexPathForDate(_ date : Date) -> IndexPath? {
+        
+        let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.firstDayCache, to: date)
+        
+        guard
+            let day   = distanceFromStartDate.day,
+            let month = distanceFromStartDate.month,
+            let (firstDayIndex, _) = getCachedSectionInfo(month) else { return nil }
+        
+        return IndexPath(item: day + firstDayIndex, section: month)
+    }
+    
+    func dateFromIndexPath(_ indexPath: IndexPath) -> Date? {
+        
+        let month = indexPath.section
+        
+        guard let monthInfo = getCachedSectionInfo(month) else { return nil }
+        
+        var components      = DateComponents()
+        components.month    = month
+        components.day      = indexPath.item - monthInfo.firstDay
+        
+        return self.calendar.date(byAdding: components, to: self.firstDayCache)
     }
 }

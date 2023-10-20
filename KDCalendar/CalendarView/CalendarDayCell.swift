@@ -25,15 +25,11 @@
 
 import UIKit
 
+// MARK: UICollectionViewCell
 open class CalendarDayCell: UICollectionViewCell {
     
     var style: CalendarView.Style = CalendarView.Style.Default
-    
-    override open var description: String {
-        let dayString = self.textLabel.text ?? " "
-        return "<DayCell (text:\"\(dayString)\")>"
-    }
-    
+
     var day: Int? {
         set {
             guard let value = newValue else { return self.textLabel.text = nil }
@@ -106,6 +102,23 @@ open class CalendarDayCell: UICollectionViewCell {
         }
     }
     
+    // MARK: - Public methods
+    public func clearStyles() {
+        self.bgView.layer.borderColor = style.cellBorderColor.cgColor
+        self.bgView.layer.borderWidth = style.cellBorderWidth
+        self.bgView.backgroundColor = style.cellColorDefault
+        self.textLabel.textColor = style.cellTextColorDefault
+    }
+    
+    // MARK: Subviews
+    
+    let textLabel   = UILabel()
+    let dotsView    = UIView()
+    let bgView      = UIView()
+    var containerView = UIView()
+    
+    // MARK: Override properties
+    
     override open var isSelected : Bool {
         didSet {
             switch isSelected {
@@ -116,29 +129,19 @@ open class CalendarDayCell: UICollectionViewCell {
             case false:
                 self.bgView.layer.borderColor = style.cellBorderColor.cgColor
                 self.bgView.layer.borderWidth = style.cellBorderWidth
-                if self.isToday {
-                    self.bgView.backgroundColor = style.cellColorToday
-                } else {
-                    self.bgView.backgroundColor = style.cellColorDefault
-                }
+                self.bgView.backgroundColor = style.cellColorDefault
             }
             
             updateTextColor()
         }
     }
     
-    // MARK: - Public methods
-    public func clearStyles() {
-        self.bgView.layer.borderColor = style.cellBorderColor.cgColor
-        self.bgView.layer.borderWidth = style.cellBorderWidth
-        self.bgView.backgroundColor = style.cellColorDefault
-        self.textLabel.textColor = style.cellTextColorDefault
+    override open var description: String {
+        let dayString = self.textLabel.text ?? " "
+        return "<DayCell (text:\"\(dayString)\")>"
     }
     
-    let textLabel   = UILabel()
-    let dotsView    = UIView()
-    let bgView      = UIView()
-    var containerView = UIView()
+    // MARK: Life cycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -153,15 +156,24 @@ open class CalendarDayCell: UICollectionViewCell {
         containerView.addSubview(self.dotsView)
     }
     
-    
-    required public init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override open func layoutSubviews() {
-        
         super.layoutSubviews()
-        
+        updateLayout()
+    }
+    
+    override open func prepareForReuse() {
+        super.prepareForReuse()
+        self.dotsView.backgroundColor = .clear
+    }
+}
+
+// MARK: - Update layout (private)
+private extension CalendarDayCell {
+    func updateLayout() {
         containerView.frame = bounds
         
         var elementsFrame = containerView.bounds.insetBy(dx: 3.0, dy: 3.0)
@@ -192,5 +204,3 @@ open class CalendarDayCell: UICollectionViewCell {
         }
     }
 }
-
-

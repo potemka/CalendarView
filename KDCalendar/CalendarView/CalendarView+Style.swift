@@ -46,6 +46,15 @@ extension CalendarView {
         public enum CalendarViewType {
             case month
             case week
+            
+            func toogle() -> CalendarViewType {
+                switch self {
+                case .month:
+                    return .week
+                case .week:
+                    return .month
+                }
+            }
         }
         
         public init(){}
@@ -86,7 +95,7 @@ extension CalendarView {
         //Today Style
         public var cellTextColorToday        = UIColor(hex: "#a5a9bb")
         public var cellColorToday            = UIColor(hex: "#bdff00")
-        public var cellColorOutOfRange       = UIColor(white: 0.0, alpha: 0.5)
+        public var cellColorOutOfRange       = UIColor(hex: "#5e5f61")
         public var cellColorAdjacent         = UIColor.clear
         
         //Selected Style

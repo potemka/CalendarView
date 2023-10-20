@@ -27,10 +27,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    
     @IBOutlet weak var calendarView: CalendarView!
     @IBOutlet weak var datePicker: UIDatePicker!
-    
     
     override func viewDidLoad() {
         
@@ -38,29 +36,6 @@ class ViewController: UIViewController {
         
         let style = CalendarView.Style()
         
-        
-        //        style.cellShape                = .bevel(8.0)
-        //        style.cellColorDefault         = UIColor.clear
-        //        style.cellColorToday           = UIColor(red:1.00, green:0.84, blue:0.64, alpha:1.00)
-        //        style.cellSelectedBorderColor  = UIColor(red:1.00, green:0.63, blue:0.24, alpha:1.00)
-        //        style.cellEventColor           = UIColor(red:1.00, green:0.63, blue:0.24, alpha:1.00)
-        //        style.headerTextColor          = UIColor.gray
-        //
-        //        style.cellTextColorDefault     = UIColor(red: 249/255, green: 180/255, blue: 139/255, alpha: 1.0)
-        //        style.cellTextColorToday       = UIColor.orange
-        //        style.cellTextColorWeekend     = UIColor(red: 237/255, green: 103/255, blue: 73/255, alpha: 1.0)
-        //        style.cellColorOutOfRange      = UIColor(red: 249/255, green: 226/255, blue: 212/255, alpha: 1.0)
-        //
-        //        style.headerBackgroundColor    = UIColor.white
-        //        style.weekdaysBackgroundColor  = UIColor.white
-        //        style.firstWeekday             = .sunday
-        //
-        //        style.locale                   = Locale(identifier: "en_US")
-        //
-        //        style.cellFont = UIFont(name: "Helvetica", size: 20.0) ?? UIFont.systemFont(ofSize: 20.0)
-        //        style.headerFont = UIFont(name: "Helvetica", size: 20.0) ?? UIFont.systemFont(ofSize: 20.0)
-        //        style.weekdaysFont = UIFont(name: "Helvetica", size: 14.0) ?? UIFont.systemFont(ofSize: 14.0)
-        //
         calendarView.style = style
         
         calendarView.dataSource = self
@@ -92,26 +67,16 @@ class ViewController: UIViewController {
         self.datePicker.setDate(today, animated: false)
     }
     
-    
-    // MARK : Events
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
     
     @IBAction func onValueChange(_ picker : UIDatePicker) {
         self.calendarView.setDisplayDate(picker.date, animated: true)
     }
-    
-    @IBAction func goToPreviousMonth(_ sender: Any) {
-        self.calendarView.goToPreviousMonth()
-    }
-    @IBAction func goToNextMonth(_ sender: Any) {
-        self.calendarView.goToNextMonth()
-    }
-    
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
 }
 
-
+// MARK: - CalendarViewDataSource (implementation)
 extension ViewController: CalendarViewDataSource {
     
       func startDate() -> Date {
@@ -141,6 +106,7 @@ extension ViewController: CalendarViewDataSource {
     
 }
 
+// MARK: - CalendarViewDelegate (implementation)
 extension ViewController: CalendarViewDelegate {
     
     func calendar(_ calendar: CalendarView, didSelectDate date : Date) {
@@ -153,12 +119,9 @@ extension ViewController: CalendarViewDelegate {
        self.datePicker.setDate(date, animated: true)
    }
    
-   
    func calendar(_ calendar: CalendarView, didLongPressDate date : Date) {
    }
 }
-
-
 
 
 

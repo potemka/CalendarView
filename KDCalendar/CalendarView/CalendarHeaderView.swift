@@ -115,8 +115,7 @@ extension CalendarHeaderView {
             i = i + 1
         }
 
-//        self.backgroundColor = style.weekdaysBackgroundColor
-        self.backgroundColor = .red
+        self.backgroundColor = style.weekdaysBackgroundColor
     }
 }
 
@@ -171,8 +170,6 @@ private extension CalendarHeaderView {
         for _ in 0..<7 {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.backgroundColor = UIColor.green
-            
             dayLabels.append(label)
             self.addSubview(label)
         }
@@ -230,7 +227,7 @@ private extension CalendarHeaderView {
 // MARK: - Handle button action (private)
 private extension CalendarHeaderView {
     @objc func handleDownAction() {
-        self.delegate?.calendarHeaderDidOccurAction(.down)
+        self.delegate?.calendarHeaderDidOccurAction(self.style.viewType == .month ? .down : .up)
     }
     
     @objc func handleLeftAction() {
