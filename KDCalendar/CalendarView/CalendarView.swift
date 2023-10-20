@@ -165,6 +165,8 @@ public class CalendarView: UIView {
         self.headerView.style = style
         self.addSubview(self.headerView)
         
+        self.headerView.backgroundColor = .red
+        
         /* Layout */
         let layout = CalendarFlowLayout()
         layout.scrollDirection = self.direction;

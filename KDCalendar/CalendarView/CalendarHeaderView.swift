@@ -25,7 +25,31 @@
 
 import UIKit
 
+// MARK: CalendarHeaderAction
+enum CalendarHeaderAction {
+    case down
+    case left
+    case right
+}
+
+// MARK: - CalendarHeaderDelegate (protocol)
+protocol CalendarHeaderDelegate: AnyObject {
+    func calendarHeaderDidOccurAction(_ action: CalendarHeaderAction)
+}
+
+// MARK: - CalendarHeaderView
 open class CalendarHeaderView: UIView {
+    
+    // MARK: Private properties
+    
+    private var monthLeftMargin: CGFloat = 16.0
+    private var monthTopMargin: CGFloat = 0.0
+    private var monthWidth: CGFloat = 110.0
+    private var montHeight: CGFloat = 32.0
+    
+    // MARK: Public properties
+    
+    weak var delegate: CalendarHeaderDelegate?
     
     var style: CalendarView.Style = CalendarView.Style.Default {
         didSet {
@@ -33,36 +57,41 @@ open class CalendarHeaderView: UIView {
         }
     }
     
-    var monthLabel: UILabel!
-    
-    var dayLabels = [UILabel]()
-    
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        self.translatesAutoresizingMaskIntoConstraints = false
-        
-        monthLabel = UILabel()
-        monthLabel.translatesAutoresizingMaskIntoConstraints = false
-        monthLabel.backgroundColor = UIColor.clear
-        self.addSubview(monthLabel)
-        
-        for _ in 0..<7 {
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.backgroundColor = UIColor.clear
-            
-            dayLabels.append(label)
-            self.addSubview(label)
+    var monthTitle: String = "" {
+        didSet {
+            self.downButton?.setTitle(monthTitle, for: .normal)
         }
     }
     
+    // MARK: Subviews
+    
+    var dayLabels = [UILabel]()
+    
+    weak var downButton: UIButton?
+    weak var leftButton: UIButton?
+    weak var rightButton: UIButton?
+    
+    // MARK: Life cycle
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupSubviews()
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        updateLayout()
+    }
+}
+
+// MARK: - Update style (public)
+extension CalendarHeaderView {
     public func updateStyle() {
-        self.monthLabel.textAlignment = NSTextAlignment.center
-        self.monthLabel.font = style.headerFont
-        self.monthLabel.textColor = style.headerTextColor
-        self.monthLabel.backgroundColor = style.headerBackgroundColor
-        
+
         let formatter = DateFormatter()
         formatter.locale = style.locale
         formatter.timeZone = style.calendar.timeZone
@@ -80,34 +109,92 @@ open class CalendarHeaderView: UIView {
             i = i + 1
         }
 
-        self.backgroundColor = style.weekdaysBackgroundColor
+//        self.backgroundColor = style.weekdaysBackgroundColor
+        self.backgroundColor = .red
     }
-    
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override open func layoutSubviews() {
-        super.layoutSubviews()
+}
+
+// MARK: - Setup subviews (private)
+private extension CalendarHeaderView {
+    func setupSubviews() {
+        func setupDownButton() {
+            let downButton = UIButton()
+            downButton.translatesAutoresizingMaskIntoConstraints = false
+            downButton.clipsToBounds = true
+            downButton.layer.cornerRadius = 10.0
+            downButton.setTitleColor(self.style.headerTextColor, for: .normal)
+            downButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+            downButton.backgroundColor = self.style.commonBackground
+            downButton.layer.borderWidth = 1.0
+            downButton.layer.borderColor = self.style.headerMonthBorderColor.cgColor
+            downButton.setImage(UIImage(named: "downArrow"), for: .normal)
+            downButton.semanticContentAttribute = .forceRightToLeft
+            downButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 0)
+            downButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
+            downButton.addTarget(self, action: #selector(handleDownAction), for: .touchUpInside)
+            self.addSubview(downButton)
+            self.downButton = downButton
+        }
         
+        func setupLeftButton() {
+            let leftButton = UIButton()
+            leftButton.translatesAutoresizingMaskIntoConstraints = false
+            leftButton.backgroundColor = .clear
+            leftButton.setImage(UIImage(named: "leftArrow"), for: .normal)
+            leftButton.addTarget(self, action: #selector(handleLeftAction), for: .touchUpInside)
+            self.addSubview(leftButton)
+            self.leftButton = leftButton
+        }
+        
+        func setupRightButton() {
+            let rightButton = UIButton()
+            rightButton.translatesAutoresizingMaskIntoConstraints = false
+            rightButton.backgroundColor = .clear
+            rightButton.setImage(UIImage(named: "rightArrow"), for: .normal)
+            rightButton.addTarget(self, action: #selector(handleRightAction), for: .touchUpInside)
+            self.addSubview(rightButton)
+            self.rightButton = rightButton
+        }
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
+        
+        setupDownButton()
+        setupLeftButton()
+        setupRightButton()
+        
+        for _ in 0..<7 {
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.backgroundColor = UIColor.clear
+            
+            dayLabels.append(label)
+            self.addSubview(label)
+        }
+    }
+}
+
+// MARK: - Update layout (private)
+private extension CalendarHeaderView {
+    func updateLayout() {
         var isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+        isRtl = self.effectiveUserInterfaceLayoutDirection == .rightToLeft
         
-        if #available(iOS 10.0, *) {
-            isRtl = self.effectiveUserInterfaceLayoutDirection == .rightToLeft
-        }
-        else if #available(iOS 9.0, *) {
-            isRtl = UIView.userInterfaceLayoutDirection(for: self.semanticContentAttribute) == .rightToLeft
-        }
+//        self.monthLabel?.frame = CGRect(
+//            x: 0.0,
+//            y: style.headerTopMargin,
+//            width: self.bounds.size.width,
+//            height: self.bounds.size.height
+//                - style.headerTopMargin
+//                - style.weekdaysHeight
+//                - style.weekdaysBottomMargin
+//                - style.weekdaysTopMargin
+//        )
         
-        self.monthLabel?.frame = CGRect(
-            x: 0.0,
-            y: style.headerTopMargin,
-            width: self.bounds.size.width,
-            height: self.bounds.size.height
-                - style.headerTopMargin
-                - style.weekdaysHeight
-                - style.weekdaysBottomMargin
-                - style.weekdaysTopMargin
+        self.downButton?.frame = CGRect(
+            x: monthLeftMargin,
+            y: monthTopMargin,
+            width: monthWidth,
+            height: montHeight
         )
         
         var labelFrame = CGRect(
@@ -128,5 +215,20 @@ open class CalendarHeaderView: UIView {
             
             labelFrame.origin.x += isRtl ? -labelFrame.size.width : labelFrame.size.width
         }
+    }
+}
+
+// MARK: - Handle button action (private)
+private extension CalendarHeaderView {
+    @objc func handleDownAction() {
+        self.delegate?.calendarHeaderDidOccurAction(.down)
+    }
+    
+    @objc func handleLeftAction() {
+        self.delegate?.calendarHeaderDidOccurAction(.left)
+    }
+    
+    @objc func handleRightAction() {
+        self.delegate?.calendarHeaderDidOccurAction(.right)
     }
 }
