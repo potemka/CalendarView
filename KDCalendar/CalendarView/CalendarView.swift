@@ -163,6 +163,7 @@ public class CalendarView: UIView {
         /* Header View */
         self.headerView = CalendarHeaderView(frame:CGRect.zero)
         self.headerView.style = style
+        self.headerView.delegate = self
         self.addSubview(self.headerView)
         
         self.headerView.backgroundColor = .red
@@ -312,6 +313,22 @@ public class CalendarView: UIView {
         }
         
         return point
+    }
+}
+
+// MARK: - CalendarHeaderDelegate (implementation)
+extension CalendarView: CalendarHeaderDelegate {
+    func calendarHeaderDidOccurAction(_ action: CalendarHeaderAction) {
+        switch action {
+        case .down:
+            break
+        case .up:
+            break
+        case .left:
+            break
+        case .right:
+            break
+        }
     }
 }
 

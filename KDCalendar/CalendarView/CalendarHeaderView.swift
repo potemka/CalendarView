@@ -28,6 +28,7 @@ import UIKit
 // MARK: CalendarHeaderAction
 enum CalendarHeaderAction {
     case down
+    case up
     case left
     case right
 }
@@ -42,10 +43,15 @@ open class CalendarHeaderView: UIView {
     
     // MARK: Private properties
     
-    private var monthLeftMargin: CGFloat = 16.0
+    private var monthLeftMargin: CGFloat = 0.0
     private var monthTopMargin: CGFloat = 0.0
     private var monthWidth: CGFloat = 110.0
     private var montHeight: CGFloat = 32.0
+    
+    private var rightButtonRightMargin: CGFloat = 0
+    private var arrowButtonTopMargin : CGFloat = 6
+    private var arrowButtonHeight: CGFloat = 22.0
+    private var arrowButtonsIndent: CGFloat = 20.0
     
     // MARK: Public properties
     
@@ -165,7 +171,7 @@ private extension CalendarHeaderView {
         for _ in 0..<7 {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.backgroundColor = UIColor.clear
+            label.backgroundColor = UIColor.green
             
             dayLabels.append(label)
             self.addSubview(label)
@@ -179,22 +185,25 @@ private extension CalendarHeaderView {
         var isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
         isRtl = self.effectiveUserInterfaceLayoutDirection == .rightToLeft
         
-//        self.monthLabel?.frame = CGRect(
-//            x: 0.0,
-//            y: style.headerTopMargin,
-//            width: self.bounds.size.width,
-//            height: self.bounds.size.height
-//                - style.headerTopMargin
-//                - style.weekdaysHeight
-//                - style.weekdaysBottomMargin
-//                - style.weekdaysTopMargin
-//        )
-        
         self.downButton?.frame = CGRect(
             x: monthLeftMargin,
             y: monthTopMargin,
             width: monthWidth,
             height: montHeight
+        )
+        
+        self.rightButton?.frame = CGRect(
+            x: bounds.width - rightButtonRightMargin - arrowButtonHeight,
+            y: arrowButtonTopMargin,
+            width: arrowButtonHeight,
+            height: arrowButtonHeight
+        )
+        
+        self.leftButton?.frame = CGRect(
+            x: bounds.width - rightButtonRightMargin - 2*arrowButtonHeight - arrowButtonsIndent,
+            y: arrowButtonTopMargin,
+            width: arrowButtonHeight,
+            height: arrowButtonHeight
         )
         
         var labelFrame = CGRect(

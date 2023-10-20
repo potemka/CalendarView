@@ -61,8 +61,8 @@ extension CalendarView {
         // Header month
         public var headerMonthBorderColor    = UIColor(hex: "#a4a9bb")
         
-        public var weekdaysTopMargin: CGFloat     = 0.0
-        public var weekdaysBottomMargin: CGFloat  = 12.0
+        public var weekdaysTopMargin: CGFloat     = 12.0
+        public var weekdaysBottomMargin: CGFloat  = 0.0
         public var weekdaysHeight: CGFloat        = 50.0
         public var weekdaysTextColor              = UIColor(hex: "#a5a9bb")
         public var weekdaysBackgroundColor        = UIColor(hex: "#181a1f")
