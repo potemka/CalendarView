@@ -24,12 +24,9 @@
  */
 
 import UIKit
-import EventKit
-
-
 
 class ViewController: UIViewController {
-
+    
     
     @IBOutlet weak var calendarView: CalendarView!
     @IBOutlet weak var datePicker: UIDatePicker!
@@ -90,18 +87,6 @@ class ViewController: UIViewController {
         
         let tomorrow = self.calendarView.calendar.date(byAdding: tomorrowComponents, to: today)!
         self.calendarView.selectDate(tomorrow)
-
-        #if KDCALENDAR_EVENT_MANAGER_ENABLED
-        self.calendarView.loadEvents() { error in
-            if error != nil {
-                let message = "The karmadust calender could not load system events. It is possibly a problem with permissions"
-                let alert = UIAlertController(title: "Events Loading Error", message: message, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            }
-        }
-        #endif
-        
         
         self.calendarView.setDisplayDate(today)
         
@@ -122,13 +107,11 @@ class ViewController: UIViewController {
     }
     @IBAction func goToNextMonth(_ sender: Any) {
         self.calendarView.goToNextMonth()
-        
     }
     
     override var prefersStatusBarHidden: Bool {
         return true
     }
-    
 }
 
 
@@ -163,50 +146,19 @@ extension ViewController: CalendarViewDataSource {
 
 extension ViewController: CalendarViewDelegate {
     
-    func calendar(_ calendar: CalendarView, didSelectDate date : Date, withEvents events: [CalendarEvent]) {
-           
-           print("Did Select: \(date) with \(events.count) events")
-           for event in events {
-               print("\t\"\(event.title)\" - Starting at:\(event.startDate)")
-           }
-           
-       }
+    func calendar(_ calendar: CalendarView, didSelectDate date : Date) {
+           print("Did Select: \(date)")
+    }
        
-       func calendar(_ calendar: CalendarView, didScrollToMonth date : Date) {
-           print(self.calendarView.selectedDates)
-           
-           self.datePicker.setDate(date, animated: true)
-       }
+   func calendar(_ calendar: CalendarView, didScrollToMonth date : Date) {
+       print(self.calendarView.selectedDates)
        
-       
-       func calendar(_ calendar: CalendarView, didLongPressDate date : Date, withEvents events: [CalendarEvent]?) {
-           
-           if let events = events {
-               for event in events {
-                   print("\t\"\(event.title)\" - Starting at:\(event.startDate)")
-               }
-           }
-           
-           let alert = UIAlertController(title: "Create New Event", message: "Message", preferredStyle: .alert)
-           
-           alert.addTextField { (textField: UITextField) in
-               textField.placeholder = "Event Title"
-           }
-           
-           let addEventAction = UIAlertAction(title: "Create", style: .default, handler: { (action) -> Void in
-               let title = alert.textFields?.first?.text
-               self.calendarView.addEvent(title!, date: date)
-           })
-           
-           let cancelAction = UIAlertAction(title: "Cancel", style: .destructive, handler: nil)
-           
-           alert.addAction(addEventAction)
-           alert.addAction(cancelAction)
-           
-           self.present(alert, animated: true, completion: nil)
-           
-       }
-    
+       self.datePicker.setDate(date, animated: true)
+   }
+   
+   
+   func calendar(_ calendar: CalendarView, didLongPressDate date : Date) {
+   }
 }
 
 

@@ -34,13 +34,6 @@ open class CalendarDayCell: UICollectionViewCell {
         return "<DayCell (text:\"\(dayString)\")>"
     }
     
-    var eventsCount = 0 {
-        didSet {
-            self.dotsView.isHidden = (eventsCount == 0)
-            self.setNeedsLayout()
-        }
-    }
-    
     var day: Int? {
         set {
             guard let value = newValue else { return self.textLabel.text = nil }
@@ -140,9 +133,7 @@ open class CalendarDayCell: UICollectionViewCell {
         self.bgView.layer.borderWidth = style.cellBorderWidth
         self.bgView.backgroundColor = style.cellColorDefault
         self.textLabel.textColor = style.cellTextColorDefault
-        self.eventsCount = 0
     }
-    
     
     let textLabel   = UILabel()
     let dotsView    = UIView()
@@ -200,10 +191,7 @@ open class CalendarDayCell: UICollectionViewCell {
         case .bevel(let radius):
             self.bgView.layer.cornerRadius = radius
         }
-        
-        
     }
-    
 }
 
 

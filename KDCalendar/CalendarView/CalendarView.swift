@@ -24,27 +24,6 @@
  */
 
 import UIKit
-#if KDCALENDAR_EVENT_MANAGER_ENABLED
-import EventKit
-#endif
-
-struct EventLocation {
-    let title: String
-    let latitude: Double
-    let longitude: Double
-}
-
-public struct CalendarEvent {
-    public let title: String
-    public let startDate: Date
-    public let endDate:Date
-    
-    public init(title: String, startDate: Date, endDate: Date) {
-        self.title = title;
-        self.startDate = startDate;
-        self.endDate = endDate;
-    }
-}
 
 public protocol CalendarViewDataSource {
     func startDate() -> Date
@@ -70,17 +49,17 @@ extension CalendarViewDataSource {
 public protocol CalendarViewDelegate {
     
     func calendar(_ calendar : CalendarView, didScrollToMonth date : Date) -> Void
-    func calendar(_ calendar : CalendarView, didSelectDate date : Date, withEvents events: [CalendarEvent]) -> Void
+    func calendar(_ calendar : CalendarView, didSelectDate date : Date) -> Void
     /* optional */
     func calendar(_ calendar : CalendarView, canSelectDate date : Date) -> Bool
     func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void
-    func calendar(_ calendar : CalendarView, didLongPressDate date : Date, withEvents events: [CalendarEvent]?) -> Void
+    func calendar(_ calendar : CalendarView, didLongPressDate date : Date) -> Void
 }
 
 extension CalendarViewDelegate {
     func calendar(_ calendar : CalendarView, canSelectDate date : Date) -> Bool { return true }
     func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void { return }
-    func calendar(_ calendar : CalendarView, didLongPressDate date : Date, withEvents events: [CalendarEvent]?) -> Void { return }
+    func calendar(_ calendar : CalendarView, didLongPressDate date : Date) -> Void { return }
 }
 
 public class CalendarView: UIView {
@@ -119,23 +98,6 @@ public class CalendarView: UIView {
     internal var endIndexPath   : IndexPath!
 
     internal var _cachedMonthInfoForSection = [Int:(firstDay: Int, daysTotal: Int)]()
-    internal var eventsByIndexPath = [IndexPath: [CalendarEvent]]()
-    
-    public var events: [CalendarEvent] = [] {
-        didSet {
-            self.eventsByIndexPath.removeAll()
-            
-            for event in events {
-                guard let indexPath = self.indexPathForDate(event.startDate) else { continue }
-                
-                var eventsForIndexPath = eventsByIndexPath[indexPath] ?? []
-                eventsForIndexPath.append(event)
-                eventsByIndexPath[indexPath] = eventsForIndexPath
-            }
-            
-            DispatchQueue.main.async { self.collectionView.reloadData() }
-        }
-    }
     
     var flowLayout: CalendarFlowLayout {
         return self.collectionView.collectionViewLayout as! CalendarFlowLayout
@@ -151,21 +113,12 @@ public class CalendarView: UIView {
     public var delegate: CalendarViewDelegate?
     public var dataSource: CalendarViewDataSource?
     
-    #if swift(>=4.2)
     public var direction : UICollectionView.ScrollDirection = .horizontal {
         didSet {
             flowLayout.scrollDirection = direction
             self.collectionView.reloadData()
         }
     }
-    #else
-    public var direction : UICollectionView.ScrollDirection = .horizontal {
-        didSet {
-            flowLayout.scrollDirection = direction
-            self.collectionView.reloadData()
-        }
-    }
-    #endif
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -248,15 +201,8 @@ public class CalendarView: UIView {
             let date = self.dateFromIndexPath(indexPath) else {
             return
         }
-        
-        guard
-            let indexPathEvents = collectionView.indexPathForItem(at: point),
-            let events = self.eventsByIndexPath[indexPathEvents], events.count > 0 else {
-                self.delegate?.calendar(self, didLongPressDate: date, withEvents: nil)
-                return
-        }
-        
-        self.delegate?.calendar(self, didLongPressDate: date, withEvents: events)
+ 
+        self.delegate?.calendar(self, didLongPressDate: date)
     }
     
     override open func layoutSubviews() {
@@ -491,46 +437,4 @@ extension CalendarView {
         selectedDates.removeAll()
         self.reloadData()
     }
-
-
-    #if KDCALENDAR_EVENT_MANAGER_ENABLED
-    
-    public func loadEvents(onComplete: ((Error?) -> Void)? = nil) {
-        
-        EventsManager.load(from: self.startDateCache, to: self.endDateCache) { // (events:[CalendarEvent]?) in
-            
-            if let events = $0 {
-                self.events = events
-                onComplete?(nil)
-            } else {
-                onComplete?(EventsManagerError.Authorization)
-            }
-            
-        }
-    }
-    
-    @discardableResult public func addEvent(_ title: String, date startDate: Date, duration hours: NSInteger = 1) -> Bool {
-        
-        var components = DateComponents()
-        components.hour = hours
-        
-        guard let endDate = self.calendar.date(byAdding: components, to: startDate) else {
-            return false
-        }
-        
-        let event = CalendarEvent(title: title, startDate: startDate, endDate: endDate)
-        
-        guard EventsManager.add(event: event) else {
-            return false
-        }
-        
-        self.events.append(event)
-        
-        self.collectionView.reloadData()
-        
-        return true
-        
-    }
-
-    #endif
 }

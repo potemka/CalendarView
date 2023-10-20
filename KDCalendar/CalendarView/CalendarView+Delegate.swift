@@ -49,8 +49,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         
         collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
         
-        let eventsForDaySelected = eventsByIndexPath[indexPath] ?? []
-        delegate?.calendar(self, didSelectDate: date, withEvents: eventsForDaySelected)
+        delegate?.calendar(self, didSelectDate: date)
     }
     
     public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {

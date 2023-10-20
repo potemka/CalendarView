@@ -229,9 +229,7 @@ extension CalendarView: UICollectionViewDataSource {
             let weekDayOption = style.firstWeekday == .sunday ? 0 : 5
             dayCell.isWeekend = we == weekDayOption || we == 6
         }
-        
-        dayCell.eventsCount = self.eventsByIndexPath[indexPath]?.count ?? 0
-        
+                
         return dayCell
     }
 }
