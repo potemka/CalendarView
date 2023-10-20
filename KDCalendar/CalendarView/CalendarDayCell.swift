@@ -70,7 +70,7 @@ open class CalendarDayCell: UICollectionViewCell {
         didSet {
             switch isToday {
             case true:
-                self.bgView.backgroundColor = style.cellColorToday
+                self.dotsView.backgroundColor = style.cellColorToday
             case false:
                 self.bgView.backgroundColor = style.cellColorDefault
             }
@@ -144,7 +144,6 @@ open class CalendarDayCell: UICollectionViewCell {
         super.init(frame: frame)
         
         self.textLabel.textAlignment = NSTextAlignment.center
-        self.dotsView.backgroundColor = style.cellEventColor
         self.textLabel.font = style.cellFont
         
         contentView.addSubview(containerView)

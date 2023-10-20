@@ -81,6 +81,16 @@ public class CalendarView: UIView {
         }
     }
     
+    public var viewType: Style.CalendarViewType {
+        get { style.viewType }
+        set {
+            guard newValue != style.viewType else { return }
+            self.style.viewType = newValue
+            
+            reloadData()
+        }
+    }
+    
     public var calendar : Calendar {
         return style.calendar
     }
@@ -148,6 +158,7 @@ public class CalendarView: UIView {
         
         self.clipsToBounds = true
         self.translatesAutoresizingMaskIntoConstraints = false
+        self.backgroundColor = self.style.commonBackground
         
         /* Header View */
         self.headerView = CalendarHeaderView(frame:CGRect.zero)
