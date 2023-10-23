@@ -36,10 +36,20 @@ extension String {
 
 extension Date {
     func convertToTimeZone(from fromTimeZone: TimeZone, to toTimeZone: TimeZone) -> Date {
-         let delta = TimeInterval(toTimeZone.secondsFromGMT(for: self) - fromTimeZone.secondsFromGMT(for: self))
-         return addingTimeInterval(delta)
+        let delta = TimeInterval(toTimeZone.secondsFromGMT(for: self) - fromTimeZone.secondsFromGMT(for: self))
+        return addingTimeInterval(delta)
+    }
+    func startOfWeek(using calendar: Calendar = .gregorian) -> Date {
+        calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
+    }
+    func endOfWeek(using calendar: Calendar = .gregorian) -> Date {
+        let startOfWeek = self.startOfWeek()
+        return calendar.date(byAdding: .day, value: 7, to: startOfWeek)!
     }
 }
 
+extension Calendar {
+    static let gregorian = Calendar(identifier: .gregorian)
+}
 
 
