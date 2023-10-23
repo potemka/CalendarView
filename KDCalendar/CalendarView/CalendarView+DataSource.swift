@@ -26,15 +26,6 @@
 import UIKit
 
 internal extension CalendarView {
-    func resetDateCaches() {
-        _startDateCache = nil
-        _endDateCache = nil
-        
-        _firstDayCache = nil
-        _lastDayCache = nil
-        
-        _cachedMonthInfoForSection.removeAll()
-    }
     
     var startDateCache: Date {
         if _startDateCache == nil {
@@ -195,8 +186,17 @@ private extension CalendarView {
     func configureWeekDayCell(_ cell: CalendarDayCell, indexPath: IndexPath) {
         let date = self.cachedWeek[indexPath.row]
         let dateComponents = calendar.dateComponents([.day], from: date)
-        cell.isHidden = false
-        cell.day = dateComponents.day
+        if date <= self.endDateCache && date >= self.startDateCache {
+            cell.isHidden = false
+            cell.day = dateComponents.day
+            
+            if calendar.isDateInToday(date) {
+                cell.isToday = true
+            }
+        } else {
+            cell.isHidden = true
+            cell.day = nil
+        }
     }
 }
 
@@ -276,5 +276,18 @@ private extension CalendarView {
             let weekDayOption = style.firstWeekday == .sunday ? 0 : 5
             cell.isWeekend = we == weekDayOption || we == 6
         }
+    }
+}
+
+// MARK: - Reset date caches (private)
+private extension CalendarView {
+    func resetDateCaches() {
+        _startDateCache = nil
+        _endDateCache = nil
+        
+        _firstDayCache = nil
+        _lastDayCache = nil
+        
+        _cachedMonthInfoForSection.removeAll()
     }
 }

@@ -231,20 +231,12 @@ public class CalendarView: UIView {
         
         var isRtl = false
         
-        if !forceLtr
-        {
+        if !forceLtr {
             isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
-            
-            if #available(iOS 10.0, *) {
-                isRtl = self.effectiveUserInterfaceLayoutDirection == .rightToLeft
-            }
-            else if #available(iOS 9.0, *) {
-                isRtl = UIView.userInterfaceLayoutDirection(for: self.semanticContentAttribute) == .rightToLeft
-            }
+            isRtl = self.effectiveUserInterfaceLayoutDirection == .rightToLeft
         }
         
-        if _isRtl != isRtl
-        {
+        if _isRtl != isRtl {
             _isRtl = isRtl
             
             self.collectionView?.transform = isRtl
@@ -318,19 +310,13 @@ extension CalendarView {
      function: - scroll calendar at date (month/year) passed as parameter.
      */
     public func setDisplayDate(_ date : Date, animated: Bool = false) {
-		if #available(iOS 10.0, *) {
-			guard
-				let startDate = calendar.dateInterval(of: .month, for: startDateCache)?.start,
-				let endDate = calendar.dateInterval(of: .month, for: endDateCache)?.end,
-				(startDate..<endDate).contains(date)
-			else {
-				return
-			}
-		}
-		else {
-			guard (startDateCache..<endDateCache).contains(date) else { return }
-		}
-		
+        guard (startDateCache..<endDateCache).contains(date)
+        else { return }
+        
+        if style.viewType == .week {
+            updateCachedWeek(by: date)
+        }
+        
         self.collectionView?.reloadData()
         self.collectionView?.setContentOffset(self.scrollViewOffset(for: date), animated: animated)
         self.displayDateOnHeader(date)
@@ -379,6 +365,14 @@ extension CalendarView {
      */
     public func goToPreviousMonth() {
         goToMonthWithOffet(-1)
+    }
+    
+    public func goToNextWeek() {
+        goToWeekWithOffset(1)
+    }
+    
+    public func goToPrevWeek() {
+        goToWeekWithOffset(-1)
     }
 
     /*
@@ -444,7 +438,7 @@ private extension CalendarView {
         case.month:
             goToPreviousMonth()
         case .week:
-            break
+            goToPrevWeek()
         }
     }
     
@@ -453,7 +447,7 @@ private extension CalendarView {
         case .month:
             goToNextMonth()
         case .week:
-            break
+            goToNextWeek()
         }
     }
 }
@@ -466,6 +460,24 @@ private extension CalendarView {
         dateComponents.month = offset
         guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
         self.setDisplayDate(newDate, animated: true)
+    }
+}
+
+// MARK: - Go to week with offset (private)
+private extension CalendarView {
+    func goToWeekWithOffset(_ offset: Int) {
+        guard let displayDate = self.displayDate else { return }
+        var dateComponents = DateComponents()
+        dateComponents.weekOfYear = offset
+        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
+        self.setDisplayDate(newDate, animated: true)
+    }
+}
+
+// MARK: - Update cached week (private)
+private extension CalendarView {
+    func updateCachedWeek(by date: Date) {
+        _cachedWeek = Date.dates(from: date.startOfWeek(), to: date.endOfWeek())
     }
 }
 
