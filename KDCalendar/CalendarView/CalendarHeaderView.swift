@@ -116,6 +116,13 @@ extension CalendarHeaderView {
         }
 
         self.backgroundColor = style.weekdaysBackgroundColor
+        
+        switch style.viewType {
+        case .month:
+            self.downButton?.setImage(UIImage(named: "downArrow"), for: .normal)
+        case .week:
+            self.downButton?.setImage(UIImage(named: "upArrow"), for: .normal)
+        }
     }
 }
 
