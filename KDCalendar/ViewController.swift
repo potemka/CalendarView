@@ -57,8 +57,8 @@ class ViewController: UIViewController {
         tomorrowComponents.day = 1
         
         
-        let tomorrow = self.calendarView.calendar.date(byAdding: tomorrowComponents, to: today)!
-        self.calendarView.selectDate(tomorrow)
+//        let tomorrow = self.calendarView.calendar.date(byAdding: tomorrowComponents, to: today)!
+//        self.calendarView.selectDate(tomorrow)
         
         self.calendarView.setDisplayDate(today)
         

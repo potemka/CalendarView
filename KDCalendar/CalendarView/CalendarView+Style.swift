@@ -83,7 +83,7 @@ extension CalendarView {
         public var cellShape                 = CellShapeOptions.round
         
         public var firstWeekday              = FirstWeekdayOptions.monday
-        public var showAdjacentDays          = false
+        public var showAdjacentDays          = true
         
         //Default Style
         public var cellColorDefault          = UIColor(hex: "#181a1f")
@@ -118,7 +118,7 @@ extension CalendarView {
         }()
         
         public var weekDayTransform = WeekDaysTransform.capitalized
-        public var viewType: CalendarViewType = .month
+        public var viewType: CalendarViewType = .week
         
     }
 }

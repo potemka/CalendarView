@@ -108,6 +108,7 @@ public class CalendarView: UIView {
     internal var _endDateCache: Date?
     internal var _firstDayCache: Date?
     internal var _lastDayCache: Date?
+    internal var _currentWeekDay: Int?
     
     internal var todayIndexPath : IndexPath?
     internal var startIndexPath : IndexPath!
@@ -470,16 +471,16 @@ private extension CalendarView {
     }
 }
 
-// MARK: Convertions methods (privatye)
+// MARK: Convertions methods (private)
 extension CalendarView {
     func indexPathForDate(_ date : Date) -> IndexPath? {
         
         let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.firstDayCache, to: date)
         
-        guard
-            let day   = distanceFromStartDate.day,
-            let month = distanceFromStartDate.month,
-            let (firstDayIndex, _) = getCachedSectionInfo(month) else { return nil }
+        guard let day = distanceFromStartDate.day,
+              let month = distanceFromStartDate.month,
+              let (firstDayIndex, _) = getCachedMonthSectionInfo(month)
+        else { return nil }
         
         return IndexPath(item: day + firstDayIndex, section: month)
     }
@@ -488,7 +489,7 @@ extension CalendarView {
         
         let month = indexPath.section
         
-        guard let monthInfo = getCachedSectionInfo(month) else { return nil }
+        guard let monthInfo = getCachedMonthSectionInfo(month) else { return nil }
         
         var components      = DateComponents()
         components.month    = month
