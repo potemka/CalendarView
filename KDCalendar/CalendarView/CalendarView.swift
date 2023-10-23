@@ -165,23 +165,14 @@ public class CalendarView: UIView {
     
     @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
         
-        #if swift(>=4.2)
-        guard gesture.state == UIGestureRecognizer.State.began else {
-            return
-        }
-        #else
-        guard gesture.state == UIGestureRecognizer.State.began else {
-            return
-        }
-        #endif
+        guard gesture.state == UIGestureRecognizer.State.began
+        else { return }
         
         let point = gesture.location(in: collectionView)
         
-        guard
-            let indexPath = collectionView.indexPathForItem(at: point),
-            let date = self.dateFromIndexPath(indexPath) else {
-            return
-        }
+        guard let indexPath = collectionView.indexPathForItem(at: point),
+            let date = self.dateFromIndexPath(indexPath)
+        else { return }
  
         self.delegate?.calendar(self, didLongPressDate: date)
     }
@@ -283,7 +274,21 @@ extension CalendarView: CalendarHeaderDelegate {
             let toogleViewType = self.style.viewType.toogle()
             self.style.viewType = toogleViewType
             self.headerView.style = style
-            self.reloadData()
+            
+            if self.style.viewType == .month {
+                let selectDate: Date = {
+                    guard let selectDate = self.selectedDates.first
+                    else {
+                        guard let firstWeekdate = self.cachedWeek.first
+                        else { return Date() }
+                        return firstWeekdate
+                    }
+                    return selectDate
+                }()
+                self.setDisplayDate(selectDate)
+            } else {
+                
+            }
         case .left:
             handleLeftButtonAction()
         case .right:
