@@ -79,6 +79,14 @@ internal extension CalendarView {
         
         return _lastDayCache ?? Date()
     }
+    
+    var cachedWeek: [Date] {
+        guard _cachedWeek.isEmpty else { return _cachedWeek }
+        let today = Date()
+        let startWeekDate = today.startOfWeek()
+        let endWeekDate = today.endOfWeek()
+        return Date.dates(from: startWeekDate, to: endWeekDate)
+    }
 }
 
 // MARK: - UICollectionViewDataSource (implementation)
@@ -126,7 +134,12 @@ extension CalendarView: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 42 // rows:7 x cols:6
+        switch style.viewType {
+        case .month:
+            return 42 // rows:7 x cols:6
+        case .week:
+            return 7
+        }
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -143,7 +156,7 @@ extension CalendarView: UICollectionViewDataSource {
         case .month:
             configureMonthDayCell(dayCell, indexPath: indexPath)
         case .week:
-            break
+            configureWeekDayCell(dayCell, indexPath: indexPath)
         }
                 
         return dayCell
@@ -174,6 +187,16 @@ internal extension CalendarView {
         _cachedMonthInfoForSection[section] = result
         
         return result
+    }
+}
+
+// MARK: - Configure week day cell (private)
+private extension CalendarView {
+    func configureWeekDayCell(_ cell: CalendarDayCell, indexPath: IndexPath) {
+        let date = self.cachedWeek[indexPath.row]
+        let dateComponents = calendar.dateComponents([.day], from: date)
+        cell.isHidden = false
+        cell.day = dateComponents.day
     }
 }
 

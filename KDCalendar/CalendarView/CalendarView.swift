@@ -115,6 +115,7 @@ public class CalendarView: UIView {
     internal var endIndexPath   : IndexPath!
 
     internal var _cachedMonthInfoForSection = [Int:(firstDay: Int, daysTotal: Int)]()
+    internal var _cachedWeek: [Date] = []
     
     var flowLayout: CalendarFlowLayout {
         return self.collectionView.collectionViewLayout as! CalendarFlowLayout
@@ -460,12 +461,9 @@ private extension CalendarView {
 // MARK: - Go to month with offset (private)
 private extension CalendarView {
     func goToMonthWithOffet(_ offset: Int) {
-        
         guard let displayDate = self.displayDate else { return }
-        
         var dateComponents = DateComponents()
         dateComponents.month = offset
-    
         guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
         self.setDisplayDate(newDate, animated: true)
     }
@@ -474,27 +472,37 @@ private extension CalendarView {
 // MARK: Convertions methods (private)
 extension CalendarView {
     func indexPathForDate(_ date : Date) -> IndexPath? {
-        
-        let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.firstDayCache, to: date)
-        
-        guard let day = distanceFromStartDate.day,
-              let month = distanceFromStartDate.month,
-              let (firstDayIndex, _) = getCachedMonthSectionInfo(month)
-        else { return nil }
-        
-        return IndexPath(item: day + firstDayIndex, section: month)
+        switch style.viewType {
+        case .month:
+            let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.firstDayCache, to: date)
+            
+            guard let day = distanceFromStartDate.day,
+                  let month = distanceFromStartDate.month,
+                  let (firstDayIndex, _) = getCachedMonthSectionInfo(month)
+            else { return nil }
+            
+            return IndexPath(item: day + firstDayIndex, section: month)
+        case .week:
+            guard let index = cachedWeek.firstIndex(where: { $0 == date })
+            else { return nil }
+            return IndexPath(item: index, section: 0)
+        }
     }
     
     func dateFromIndexPath(_ indexPath: IndexPath) -> Date? {
-        
-        let month = indexPath.section
-        
-        guard let monthInfo = getCachedMonthSectionInfo(month) else { return nil }
-        
-        var components      = DateComponents()
-        components.month    = month
-        components.day      = indexPath.item - monthInfo.firstDay
-        
-        return self.calendar.date(byAdding: components, to: self.firstDayCache)
+        switch style.viewType {
+        case .month:
+            let month = indexPath.section
+            
+            guard let monthInfo = getCachedMonthSectionInfo(month) else { return nil }
+            
+            var components      = DateComponents()
+            components.month    = month
+            components.day      = indexPath.item - monthInfo.firstDay
+            
+            return self.calendar.date(byAdding: components, to: self.firstDayCache)
+        case .week:
+            return cachedWeek[indexPath.row]
+        }
     }
 }
