@@ -168,6 +168,10 @@ open class CalendarDayCell: UICollectionViewCell {
     override open func prepareForReuse() {
         super.prepareForReuse()
         self.dotsView.backgroundColor = .clear
+        self.isToday = false
+        self.isWeekend = false
+        self.isAdjacent = false
+        self.isOutOfRange = false
     }
 }
 

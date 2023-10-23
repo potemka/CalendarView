@@ -283,6 +283,7 @@ extension CalendarView: CalendarHeaderDelegate {
             let toogleViewType = self.style.viewType.toogle()
             self.style.viewType = toogleViewType
             self.headerView.style = style
+            self.reloadData()
         case .left:
             handleLeftButtonAction()
         case .right:
