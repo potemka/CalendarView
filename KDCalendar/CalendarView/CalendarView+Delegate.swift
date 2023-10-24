@@ -37,16 +37,12 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         
         // TODO: - Похоже на костыли
         if let selectedIndexPath = self.selectedIndexPath {
-            collectionView.deselectItem(at: selectedIndexPath, animated: false)
             self.selectedDate = nil
             self.selectedIndexPath = nil
         }
         
-        
         self.selectedIndexPath = indexPath
         self.selectedDate = date
-        
-//        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
         
         delegate?.calendar(self, didSelectDate: date)
     }
@@ -57,8 +53,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         if let selectedIndexPath = self.selectedIndexPath {
             self.selectedIndexPath = nil
             self.selectedDate = nil
-            
-            collectionView.deselectItem(at: selectedIndexPath, animated: false)
+
             delegate?.calendar(self, didDeselectDate: date)
         }
     }

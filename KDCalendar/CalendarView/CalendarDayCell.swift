@@ -35,9 +35,6 @@ open class CalendarDayCell: UICollectionViewCell {
             guard let value = newValue else { return self.textLabel.text = nil }
             self.textLabel.text = String(value)
             
-            if value == 26 {
-                print("Catched")
-            }
         }
         get {
             guard let value = self.textLabel.text else { return nil }
@@ -84,14 +81,6 @@ open class CalendarDayCell: UICollectionViewCell {
         }
     }
     
-    // MARK: - Public methods
-    public func clearStyles() {
-        self.bgView.layer.borderColor = style.cellBorderColor.cgColor
-        self.bgView.layer.borderWidth = style.cellBorderWidth
-        self.bgView.backgroundColor = style.cellColorDefault
-        self.textLabel.textColor = style.cellTextColorDefault
-    }
-    
     // MARK: Subviews
     
     let textLabel   = UILabel()
@@ -103,6 +92,7 @@ open class CalendarDayCell: UICollectionViewCell {
     
     override open var isSelected : Bool {
         didSet {
+            print("isSelected cell: \(isSelected)")
             switch isSelected {
             case true:
                 self.bgView.layer.borderColor = style.cellSelectedBorderColor.cgColor
@@ -149,9 +139,13 @@ open class CalendarDayCell: UICollectionViewCell {
     
     override open func prepareForReuse() {
         super.prepareForReuse()
+        
         self.dotsView.backgroundColor = .clear
         self.isToday = false
         self.isOutOfRange = false
+        self.day = nil
+        self.isHidden = true
+        self.isSelected = false
     }
 }
 

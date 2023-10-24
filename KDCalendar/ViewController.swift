@@ -109,7 +109,7 @@ extension ViewController: CalendarViewDataSource {
 extension ViewController: CalendarViewDelegate {
     
     func calendar(_ calendar: CalendarView, didSelectDate date : Date) {
-           print("Did Select: \(date)")
+        print("Did Select: \(date)")
     }
        
    func calendar(_ calendar: CalendarView, didScrollToMonth date : Date) {       

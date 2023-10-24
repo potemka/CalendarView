@@ -137,9 +137,7 @@ extension CalendarView: UICollectionViewDataSource {
         let dayCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as! CalendarDayCell
         
         dayCell.isHidden = true
-        
         dayCell.style = style
-        dayCell.clearStyles()
         
         dayCell.transform = _isRtl
             ? CGAffineTransform(scaleX: -1.0, y: 1.0)
@@ -206,6 +204,8 @@ private extension CalendarView {
         
         if let selectedDate = self.selectedDate, date == selectedDate {
             cell.isSelected = true
+        } else {
+            cell.isSelected = false
         }
     }
 }
