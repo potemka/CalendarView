@@ -83,7 +83,6 @@ extension CalendarView {
         public var cellShape                 = CellShapeOptions.round
         
         public var firstWeekday              = FirstWeekdayOptions.monday
-        public var showAdjacentDays          = true
         
         //Default Style
         public var cellColorDefault          = UIColor(hex: "#181a1f")
@@ -96,16 +95,12 @@ extension CalendarView {
         public var cellTextColorToday        = UIColor(hex: "#a5a9bb")
         public var cellColorToday            = UIColor(hex: "#bdff00")
         public var cellColorOutOfRange       = UIColor(hex: "#5e5f61")
-        public var cellColorAdjacent         = UIColor.clear
         
         //Selected Style
         public var cellSelectedBorderColor   = UIColor(hex: "#BDFF00")
         public var cellSelectedBorderWidth   = CGFloat(0.0)
         public var cellSelectedColor         = UIColor(hex: "#BDFF00")
         public var cellSelectedTextColor     = UIColor(hex: "#333333")
-        
-        //Weekend Style
-        public var cellTextColorWeekend      = UIColor(hex: "#a5a9bb")
         
         //Locale Style
         public var locale                    = Locale.current

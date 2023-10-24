@@ -43,7 +43,6 @@ class ViewController: UIViewController {
         
         calendarView.direction = .horizontal
         calendarView.multipleSelectionEnable = false
-        calendarView.marksWeekends = true
     }
     
     
@@ -113,9 +112,7 @@ extension ViewController: CalendarViewDelegate {
            print("Did Select: \(date)")
     }
        
-   func calendar(_ calendar: CalendarView, didScrollToMonth date : Date) {
-       print(self.calendarView.selectedDates)
-       
+   func calendar(_ calendar: CalendarView, didScrollToMonth date : Date) {       
        self.datePicker.setDate(date, animated: true)
    }
    

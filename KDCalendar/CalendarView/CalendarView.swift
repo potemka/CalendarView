@@ -29,8 +29,6 @@ import UIKit
 public protocol CalendarViewDataSource {
     func startDate() -> Date
     func endDate() -> Date
-    /* optional */
-    func headerString(_ date: Date) -> String?
 }
 
 extension CalendarViewDataSource {
@@ -40,10 +38,6 @@ extension CalendarViewDataSource {
     }
     func endDate() -> Date {
         return Date()
-    }
-    
-    func headerString(_ date: Date) -> String? {
-        return nil
     }
 }
 
@@ -75,8 +69,8 @@ public class CalendarView: UIView {
     
     // MARK: - Public properties
     
-    public internal(set) var selectedIndexPaths = [IndexPath]()
-    public internal(set) var selectedDates = [Date]()
+    public internal(set) var selectedIndexPath: IndexPath?
+    public internal(set) var selectedDate: Date?
     
     public var forceLtr: Bool = true {
         didSet {
@@ -123,8 +117,6 @@ public class CalendarView: UIView {
     
     public internal(set) var displayDate: Date?
     public var multipleSelectionEnable = false
-    public var enableDeselection = true
-    public var marksWeekends = true
     
     // Delegates
     public var delegate: CalendarViewDelegate?
@@ -152,15 +144,6 @@ public class CalendarView: UIView {
     override open func awakeFromNib() {
         super.awakeFromNib()
         self.setupSubviews()
-    }
-    
-    public var allowsMultipleSelection: Bool {
-        set {
-            self.collectionView.allowsMultipleSelection = newValue
-        }
-        get {
-            return self.collectionView.allowsMultipleSelection
-        }
     }
     
     @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
@@ -215,10 +198,8 @@ public class CalendarView: UIView {
     internal var _isRtl = false
     
     internal func updateLayoutDirections() {
-        if #available(iOS 9.0, *) {
-            self.collectionView?.semanticContentAttribute = .forceLeftToRight
-            self.headerView?.semanticContentAttribute = forceLtr ? .forceLeftToRight : .unspecified
-        }
+        self.collectionView?.semanticContentAttribute = .forceLeftToRight
+        self.headerView?.semanticContentAttribute = forceLtr ? .forceLeftToRight : .unspecified
         
         var isRtl = false
         
@@ -278,7 +259,7 @@ extension CalendarView: CalendarHeaderDelegate {
             if self.style.viewType == .month {
                 
                 let display: Date = {
-                    guard let selectDate = self.selectedDates.first
+                    guard let selectDate = self.selectedDate
                     else {
                         guard let firstWeekdate = self.cachedWeek.first
                         else { return Date() }
@@ -288,14 +269,14 @@ extension CalendarView: CalendarHeaderDelegate {
                 }()
                 self.setDisplayDate(display)
                 
-                guard let selectedDate = self.selectedDates.first else { return }
+                guard let selectedDate = self.selectedDate else { return }
                 self.clearAllSelectedDates()
                 self.selectDate(selectedDate)
                 self.reloadData()
                 
             } else {
                 let displayDate: Date = {
-                    guard let selectDate = self.selectedDates.first
+                    guard let selectDate = self.selectedDate
                     else {
                         guard let displayDate = self.displayDate
                         else { 
@@ -342,10 +323,6 @@ extension CalendarView {
         guard (startDateCache..<endDateCache).contains(date)
         else { return }
         
-        if style.viewType == .week {
-            updateCachedWeek(by: date)
-        }
-        
         self.collectionView?.reloadData()
         self.collectionView?.setContentOffset(self.scrollViewOffset(for: date), animated: animated)
         self.displayDateOnHeader(date)
@@ -361,7 +338,7 @@ extension CalendarView {
         guard let indexPath = self.indexPathForDate(date) else { return }
         
         self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
-        self.collectionView(collectionView, didSelectItemAt: indexPath)
+//        self.collectionView(collectionView, didSelectItemAt: indexPath)
     }
     
     /*
@@ -373,7 +350,7 @@ extension CalendarView {
     public func deselectDate(_ date : Date) {
         guard let indexPath = self.indexPathForDate(date) else { return }
         self.collectionView.deselectItem(at: indexPath, animated: false)
-        self.collectionView(collectionView, didSelectItemAt: indexPath)
+//        self.collectionView(collectionView, didSelectItemAt: indexPath)
     }
     
     /*
@@ -405,8 +382,8 @@ extension CalendarView {
      function: - clear all selected dates.  Does not call `didDeselectDate` callback
      */
     public func clearAllSelectedDates() {
-        selectedIndexPaths.removeAll()
-        selectedDates.removeAll()
+        self.selectedIndexPath = nil
+        self.selectedDate = nil
         self.reloadData()
     }
 }
@@ -443,6 +420,7 @@ private extension CalendarView {
         self.collectionView.showsHorizontalScrollIndicator  = false
         self.collectionView.showsVerticalScrollIndicator    = false
         self.collectionView.allowsMultipleSelection         = true
+        self.collectionView.isMultipleTouchEnabled = false
         self.collectionView.register(CalendarDayCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         
         self.addSubview(self.collectionView)
@@ -495,7 +473,14 @@ private extension CalendarView {
         var dateComponents = DateComponents()
         dateComponents.weekOfYear = offset
         guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
+        
+        self.updateCachedWeek(by: newDate)
         self.setDisplayDate(newDate, animated: true)
+        
+        guard let selectedDate = self.selectedDate
+        else { return }
+        
+        self.selectDate(selectedDate)
     }
 }
 

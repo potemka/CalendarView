@@ -34,6 +34,10 @@ open class CalendarDayCell: UICollectionViewCell {
         set {
             guard let value = newValue else { return self.textLabel.text = nil }
             self.textLabel.text = String(value)
+            
+            if value == 26 {
+                print("Catched")
+            }
         }
         get {
             guard let value = self.textLabel.text else { return nil }
@@ -50,12 +54,6 @@ open class CalendarDayCell: UICollectionViewCell {
         }
         else if isOutOfRange {
             self.textLabel.textColor = style.cellColorOutOfRange
-        }
-        else if isAdjacent {
-            self.textLabel.textColor = style.cellColorAdjacent
-        }
-        else if isWeekend {
-            self.textLabel.textColor = style.cellTextColorWeekend
         }
         else {
             self.textLabel.textColor = style.cellTextColorDefault
@@ -76,27 +74,11 @@ open class CalendarDayCell: UICollectionViewCell {
     }
     
     open override var isHidden: Bool {
-        get {
-            return self.containerView.isHidden
-        }
-        set {
-            self.containerView.isHidden = newValue
-        }
+        get { self.containerView.isHidden }
+        set { self.containerView.isHidden = newValue }
     }
     
     var isOutOfRange : Bool = false {
-        didSet {
-            updateTextColor()
-        }
-    }
-    
-    var isAdjacent : Bool = false {
-        didSet {
-            updateTextColor()
-        }
-    }
-    
-    var isWeekend: Bool = false {
         didSet {
             updateTextColor()
         }
@@ -169,8 +151,6 @@ open class CalendarDayCell: UICollectionViewCell {
         super.prepareForReuse()
         self.dotsView.backgroundColor = .clear
         self.isToday = false
-        self.isWeekend = false
-        self.isAdjacent = false
         self.isOutOfRange = false
     }
 }

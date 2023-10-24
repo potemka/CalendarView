@@ -31,26 +31,22 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         
         guard let date = self.dateFromIndexPath(indexPath) else { return }
         
-        if let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell, currentCell.isOutOfRange || currentCell.isAdjacent {
+        if let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell, currentCell.isOutOfRange  {
             return
         }
         
-        if !multipleSelectionEnable {
-            selectedIndexPaths.forEach { indexPath in
-                collectionView.deselectItem(at: indexPath, animated: false)
-            }
-            
-            selectedIndexPaths.removeAll()
-            selectedDates.removeAll()
+        // TODO: - Похоже на костыли
+        if let selectedIndexPath = self.selectedIndexPath {
+            collectionView.deselectItem(at: selectedIndexPath, animated: false)
+            self.selectedDate = nil
+            self.selectedIndexPath = nil
         }
         
-        let cell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell
-        cell?.clearStyles()
         
-        selectedIndexPaths.append(indexPath)
-        selectedDates.append(date)
+        self.selectedIndexPath = indexPath
+        self.selectedDate = date
         
-        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
+//        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
         
         delegate?.calendar(self, didSelectDate: date)
     }
@@ -58,34 +54,21 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         guard let date = self.dateFromIndexPath(indexPath) else { return }
 
-        if let index = selectedIndexPaths.firstIndex(of: indexPath) {
-            if enableDeselection {
-                // bug: when deselecting the second to last item programmatically, during
-                // didDeselectDate delegation, the index returned is out of the bounds of
-                // the selectedIndexPaths array.  This guard prevents the crash
-                guard index < selectedIndexPaths.count, index < selectedDates.count else {
-                    return
-                }
-                selectedIndexPaths.remove(at: index)
-                selectedDates.remove(at: index)
-                
-                collectionView.deselectItem(at: indexPath, animated: false)
-                
-                delegate?.calendar(self, didDeselectDate: date)
-            } else {
-                collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
-            }
+        if let selectedIndexPath = self.selectedIndexPath {
+            self.selectedIndexPath = nil
+            self.selectedDate = nil
+            
+            collectionView.deselectItem(at: selectedIndexPath, animated: false)
+            delegate?.calendar(self, didDeselectDate: date)
         }
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         
         guard let dateBeingSelected = self.dateFromIndexPath(indexPath) else { return false }
-        
         let shouldSelectedCell: CalendarDayCell = collectionView.cellForItem(at: indexPath) as! CalendarDayCell
-        if shouldSelectedCell.isAdjacent {
-            return false
-        } else if calendar.isDateInToday(dateBeingSelected) {
+        
+        if calendar.isDateInToday(dateBeingSelected) {
             return true
         } else if dateBeingSelected < Date() {
             return false

@@ -197,7 +197,7 @@ private extension CalendarView {
             cell.isToday = true
         } else {
             let today = Date()
-            if date < today {
+            if date < today || date < self.startDateCache || date > self.endDateCache {
                 cell.isOutOfRange = true
             } else {
                 cell.isOutOfRange = false
@@ -230,16 +230,14 @@ private extension CalendarView {
         }
         
         let isSelected: Bool = {
-            guard let selectedDate = self.selectedDates.first,
+            guard let selectedDate = self.selectedDate,
                   let date = self.dateFromIndexPath(indexPath)
             else { return false }
             return date == selectedDate
         }()
         
         let isInRange = (firstDayIndex..<lastDayIndex).contains(indexPath.item)
-        let isAdjacent = !isInRange && style.showAdjacentDays && (
-            indexPath.item < firstDayIndex || indexPath.item >= lastDayIndex
-        )
+       
         let isPassedDate: Bool = {
             guard let date = self.dateFromIndexPath(indexPath)
             else { return false }
@@ -252,28 +250,11 @@ private extension CalendarView {
         }()
         
         // the index of this cell is within the range of first and the last day of the month
-        if isInRange || isAdjacent {
+        if isInRange {
             cell.isHidden = false
             
-            if isAdjacent {
-                if indexPath.item < firstDayIndex {
-                    if let prevInfo = self.getCachedMonthSectionInfo(indexPath.section - 1) {
-                        cell.day = prevInfo.daysTotal - firstDayIndex + indexPath.item
-                    }
-                    else {
-                        cell.isHidden = true
-                    }
-                }
-                else {
-                    cell.day = indexPath.item - lastDayIndex + 1
-                }
-            }
-            else {
-                // ex. if the first is wednesday (index of 3), subtract 2 to show it as 1
-                cell.day = (indexPath.item - firstDayIndex) + 1
-            }
-            
-            cell.isAdjacent = isAdjacent
+            // ex. if the first is wednesday (index of 3), subtract 2 to show it as 1
+            cell.day = (indexPath.item - firstDayIndex) + 1
             cell.isOutOfRange = cellOutOfRange(indexPath) || isPassedDate
             
         } else {
@@ -292,12 +273,6 @@ private extension CalendarView {
         
         if let idx = self.todayIndexPath {
             cell.isToday = (idx.section == indexPath.section && idx.item + firstDayIndex == indexPath.item)
-        }
-        
-        if self.marksWeekends {
-            let we = indexPath.item % 7
-            let weekDayOption = style.firstWeekday == .sunday ? 0 : 5
-            cell.isWeekend = we == weekDayOption || we == 6
         }
         
         if isSelected {
