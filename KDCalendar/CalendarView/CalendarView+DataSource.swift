@@ -234,7 +234,17 @@ private extension CalendarView {
         let isAdjacent = !isInRange && style.showAdjacentDays && (
             indexPath.item < firstDayIndex || indexPath.item >= lastDayIndex
         )
-    
+        let isPassedDate: Bool = {
+            guard let date = self.dateFromIndexPath(indexPath)
+            else { return false }
+            if calendar.isDateInToday(date) {
+                return false
+            } else if date < Date() {
+                return true
+            }
+            return false
+        }()
+        
         // the index of this cell is within the range of first and the last day of the month
         if isInRange || isAdjacent {
             cell.isHidden = false
@@ -258,7 +268,7 @@ private extension CalendarView {
             }
             
             cell.isAdjacent = isAdjacent
-            cell.isOutOfRange = cellOutOfRange(indexPath)
+            cell.isOutOfRange = cellOutOfRange(indexPath) || isPassedDate
             
         } else {
             cell.isHidden = true
