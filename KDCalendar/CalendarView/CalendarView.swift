@@ -270,9 +270,8 @@ extension CalendarView: CalendarHeaderDelegate {
                 self.setDisplayDate(display)
                 
                 guard let selectedDate = self.selectedDate else { return }
-                self.clearAllSelectedDates()
                 self.selectDate(selectedDate)
-                self.reloadData()
+ 
                 
             } else {
                 let displayDate: Date = {

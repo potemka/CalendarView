@@ -66,7 +66,6 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         
         guard let dateBeingSelected = self.dateFromIndexPath(indexPath) else { return false }
-        let shouldSelectedCell: CalendarDayCell = collectionView.cellForItem(at: indexPath) as! CalendarDayCell
         
         if calendar.isDateInToday(dateBeingSelected) {
             return true
