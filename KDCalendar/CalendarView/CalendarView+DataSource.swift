@@ -74,8 +74,8 @@ internal extension CalendarView {
     var cachedWeek: [Date] {
         guard _cachedWeek.isEmpty else { return _cachedWeek }
         let today = Date()
-        let startWeekDate = today.startOfWeek()
-        let endWeekDate = today.endOfWeek()
+        let startWeekDate = today.startOfWeek(using: calendar)
+        let endWeekDate = today.endOfWeek(using: calendar)
         return Date.dates(from: startWeekDate, to: endWeekDate)
     }
 }
@@ -188,21 +188,20 @@ private extension CalendarView {
     func configureWeekDayCell(_ cell: CalendarDayCell, indexPath: IndexPath) {
         let date = self.cachedWeek[indexPath.row]
         let dateComponents = calendar.dateComponents([.day], from: date)
-        if date <= self.endDateCache && date >= self.startDateCache {
-            cell.isHidden = false
-            cell.day = dateComponents.day
-            
-            if calendar.isDateInToday(date) {
-                cell.isToday = true
-            } else {
-                let today = Date()
-                if date < today {
-                    cell.isOutOfRange = true
-                }
-            }
+        cell.isHidden = false
+        cell.day = dateComponents.day
+        
+        print("ConfigureWeekDayCell: \(date)")
+        
+        if calendar.isDateInToday(date) {
+            cell.isToday = true
         } else {
-            cell.isHidden = true
-            cell.day = nil
+            let today = Date()
+            if date < today {
+                cell.isOutOfRange = true
+            } else {
+                cell.isOutOfRange = false
+            }
         }
     }
 }
@@ -229,6 +228,13 @@ private extension CalendarView {
             return isOutOfRange
             
         }
+        
+        let isSelected: Bool = {
+            guard let selectedDate = self.selectedDates.first,
+                  let date = self.dateFromIndexPath(indexPath)
+            else { return false }
+            return date == selectedDate
+        }()
         
         let isInRange = (firstDayIndex..<lastDayIndex).contains(indexPath.item)
         let isAdjacent = !isInRange && style.showAdjacentDays && (
@@ -292,6 +298,10 @@ private extension CalendarView {
             let we = indexPath.item % 7
             let weekDayOption = style.firstWeekday == .sunday ? 0 : 5
             cell.isWeekend = we == weekDayOption || we == 6
+        }
+        
+        if isSelected {
+            cell.isSelected = true
         }
     }
 }

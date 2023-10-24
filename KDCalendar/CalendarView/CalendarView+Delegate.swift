@@ -44,6 +44,9 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
             selectedDates.removeAll()
         }
         
+        let cell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell
+        cell?.clearStyles()
+        
         selectedIndexPaths.append(indexPath)
         selectedDates.append(date)
         

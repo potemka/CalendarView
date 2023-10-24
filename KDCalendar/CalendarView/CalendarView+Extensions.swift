@@ -39,12 +39,18 @@ extension Date {
         let delta = TimeInterval(toTimeZone.secondsFromGMT(for: self) - fromTimeZone.secondsFromGMT(for: self))
         return addingTimeInterval(delta)
     }
-    func startOfWeek(using calendar: Calendar = .gregorian) -> Date {
-        calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self).date!
+    func startOfWeek(using calendar: Calendar, isFirstMonday: Bool = true) -> Date {
+        var dateCompomemnts = calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear, .day, .month], from: self)
+        if isFirstMonday {
+            dateCompomemnts.day! -= 1
+            return dateCompomemnts.date!
+        } else {
+            return dateCompomemnts.date!
+        }
     }
-    func endOfWeek(using calendar: Calendar = .gregorian) -> Date {
-        let startOfWeek = self.startOfWeek()
-        return calendar.date(byAdding: .day, value: 7, to: startOfWeek)!
+    func endOfWeek(using calendar: Calendar, isFirstMonday: Bool = true) -> Date {
+        let startOfWeek = self.startOfWeek(using: calendar, isFirstMonday: isFirstMonday)
+        return calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
     }
     static func dates(from fromDate: Date, to toDate: Date) -> [Date] {
         var dates: [Date] = []
@@ -58,9 +64,4 @@ extension Date {
         return dates
     }
 }
-
-extension Calendar {
-    static let gregorian = Calendar(identifier: .gregorian)
-}
-
 

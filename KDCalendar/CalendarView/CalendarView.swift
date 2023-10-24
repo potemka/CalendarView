@@ -276,7 +276,8 @@ extension CalendarView: CalendarHeaderDelegate {
             self.headerView.style = style
             
             if self.style.viewType == .month {
-                let selectDate: Date = {
+                
+                let display: Date = {
                     guard let selectDate = self.selectedDates.first
                     else {
                         guard let firstWeekdate = self.cachedWeek.first
@@ -285,18 +286,31 @@ extension CalendarView: CalendarHeaderDelegate {
                     }
                     return selectDate
                 }()
-                self.setDisplayDate(selectDate)
+                self.setDisplayDate(display)
+                
+                guard let selectedDate = self.selectedDates.first else { return }
+                self.clearAllSelectedDates()
+                self.selectDate(selectedDate)
+                self.reloadData()
+                
             } else {
-                let selectDate: Date = {
+                let displayDate: Date = {
                     guard let selectDate = self.selectedDates.first
                     else {
                         guard let displayDate = self.displayDate
-                        else { return Date() }
+                        else { 
+                            return Date()
+                        }
                         return displayDate
                     }
                     return selectDate
                 }()
-                self.setDisplayDate(selectDate)
+                self.setDisplayDate(displayDate)
+                
+//                guard let selectedDate = self.selectedDates.first else { return }
+//                self.clearAllSelectedDates()
+//                self.selectDate(selectedDate)
+//                self.reloadData()
             }
         case .left:
             handleLeftButtonAction()
@@ -346,11 +360,7 @@ extension CalendarView {
     public func selectDate(_ date : Date) {
         guard let indexPath = self.indexPathForDate(date) else { return }
         
-        #if swift(>=4.2)
         self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
-        #else
-            self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
-        #endif
         self.collectionView(collectionView, didSelectItemAt: indexPath)
     }
     
@@ -492,7 +502,7 @@ private extension CalendarView {
 // MARK: - Update cached week (private)
 private extension CalendarView {
     func updateCachedWeek(by date: Date) {
-        _cachedWeek = Date.dates(from: date.startOfWeek(), to: date.endOfWeek())
+        _cachedWeek = Date.dates(from: date.startOfWeek(using: calendar), to: date.endOfWeek(using: calendar))
     }
 }
 
