@@ -79,15 +79,13 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         
         guard let dateBeingSelected = self.dateFromIndexPath(indexPath) else { return false }
         
-        switch viewType {
-        case .month:
-            let shouldSelectedCell: CalendarDayCell = collectionView.cellForItem(at: indexPath) as! CalendarDayCell
-            if shouldSelectedCell.isAdjacent {
-                return false
-            }
-
-        case .week:
-            break
+        let shouldSelectedCell: CalendarDayCell = collectionView.cellForItem(at: indexPath) as! CalendarDayCell
+        if shouldSelectedCell.isAdjacent {
+            return false
+        } else if calendar.isDateInToday(dateBeingSelected) {
+            return true
+        } else if dateBeingSelected < Date() {
+            return false
         }
         
         if let delegate = self.delegate {
