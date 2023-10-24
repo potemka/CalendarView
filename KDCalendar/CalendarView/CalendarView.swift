@@ -287,10 +287,8 @@ extension CalendarView: CalendarHeaderDelegate {
                 }()
                 self.setDisplayDate(displayDate)
                 
-//                guard let selectedDate = self.selectedDates.first else { return }
-//                self.clearAllSelectedDates()
-//                self.selectDate(selectedDate)
-//                self.reloadData()
+                guard let selectedDate = self.selectedDate else { return }
+                self.selectDate(selectedDate)
             }
         case .left:
             handleLeftButtonAction()
@@ -462,6 +460,10 @@ private extension CalendarView {
         dateComponents.month = offset
         guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
         self.setDisplayDate(newDate, animated: true)
+        
+        guard let selectedDate = self.selectedDate
+        else { return }
+        self.selectDate(selectedDate)
     }
 }
 
@@ -478,7 +480,6 @@ private extension CalendarView {
         
         guard let selectedDate = self.selectedDate
         else { return }
-        
         self.selectDate(selectedDate)
     }
 }
