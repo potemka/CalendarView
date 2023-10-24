@@ -332,8 +332,12 @@ extension CalendarView {
      */
     public func selectDate(_ date : Date) {
         guard let indexPath = self.indexPathForDate(date) else { return }
-        
-        self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
+        if viewType == .month {
+            self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
+        } else {
+            self.collectionView.reloadData()
+        }
+       
 //        self.collectionView(collectionView, didSelectItemAt: indexPath)
     }
     
