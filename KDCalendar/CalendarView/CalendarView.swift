@@ -69,7 +69,6 @@ public class CalendarView: UIView {
     
     // MARK: - Public properties
     
-    public internal(set) var selectedIndexPath: IndexPath?
     public internal(set) var selectedDate: Date?
     
     public var forceLtr: Bool = true {
@@ -379,7 +378,6 @@ extension CalendarView {
      function: - clear all selected dates.  Does not call `didDeselectDate` callback
      */
     public func clearAllSelectedDates() {
-        self.selectedIndexPath = nil
         self.selectedDate = nil
         self.reloadData()
     }
