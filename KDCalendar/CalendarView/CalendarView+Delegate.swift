@@ -79,6 +79,17 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         
         guard let dateBeingSelected = self.dateFromIndexPath(indexPath) else { return false }
         
+        switch viewType {
+        case .month:
+            let shouldSelectedCell: CalendarDayCell = collectionView.cellForItem(at: indexPath) as! CalendarDayCell
+            if shouldSelectedCell.isAdjacent {
+                return false
+            }
+
+        case .week:
+            break
+        }
+        
         if let delegate = self.delegate {
             return delegate.calendar(self, canSelectDate: dateBeingSelected)
         }

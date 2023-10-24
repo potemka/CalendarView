@@ -287,7 +287,16 @@ extension CalendarView: CalendarHeaderDelegate {
                 }()
                 self.setDisplayDate(selectDate)
             } else {
-                
+                let selectDate: Date = {
+                    guard let selectDate = self.selectedDates.first
+                    else {
+                        guard let displayDate = self.displayDate
+                        else { return Date() }
+                        return displayDate
+                    }
+                    return selectDate
+                }()
+                self.setDisplayDate(selectDate)
             }
         case .left:
             handleLeftButtonAction()
