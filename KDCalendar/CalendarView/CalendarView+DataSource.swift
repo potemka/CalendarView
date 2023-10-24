@@ -203,6 +203,10 @@ private extension CalendarView {
                 cell.isOutOfRange = false
             }
         }
+        
+        if let selectedDate = self.selectedDate, date == selectedDate {
+            cell.isSelected = true
+        }
     }
 }
 
