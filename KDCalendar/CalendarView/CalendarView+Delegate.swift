@@ -35,7 +35,6 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
             return
         }
         
-        // TODO: - Похоже на костыли
         if let selectedDate = self.selectedDate {
             self.selectedDate = nil
             if let selectedIndexPath = self.indexPathForDate(selectedDate) {

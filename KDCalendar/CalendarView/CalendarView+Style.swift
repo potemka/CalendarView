@@ -59,6 +59,14 @@ extension CalendarView {
         
         public init(){}
         
+        public var calendarHeight: CGFloat {
+            switch viewType {
+            case .month:
+                return headerHeight + headerTopMargin + 7*weekdaysHeight
+            case .week:
+                return headerHeight + headerTopMargin + weekdaysHeight
+            }
+        }
         
         // MARK: Header
         public var headerHeight: CGFloat     = 94.0
