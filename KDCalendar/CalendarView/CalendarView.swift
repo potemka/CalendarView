@@ -188,11 +188,24 @@ public class CalendarView: UIView {
             else {
                 return .zero
             }
-        
-        return CGSize(
-            width:   collectionView.bounds.width / 7.0,                                    // number of days in week
-            height: (collectionView.bounds.height) / 6.0 // maximum number of rows
-        )
+        switch viewType {
+        case .month:
+            return CGSize(
+                
+                width:   collectionView.bounds.width / 7.0,                                    // number of days in week
+                height: (collectionView.bounds.height) / 6.0 // maximum number of rows
+            )
+        case .week:
+            let width =  collectionView.bounds.width / 7.0
+            return CGSize(width: width, height: style.weekdaysHeight)
+            
+            return CGSize(
+                
+                width:   collectionView.bounds.width / 7.0,                                    // number of days in week
+                height: (collectionView.bounds.height) / 6.0 // maximum number of rows
+            )
+        }
+   
     }
     
     internal var _isRtl = false
@@ -251,10 +264,13 @@ public class CalendarView: UIView {
 extension CalendarView: CalendarHeaderDelegate {
     func calendarHeaderDidOccurAction(_ action: CalendarHeaderAction) {
         switch action {
+            
         case .down, .up:
             let toogleViewType = self.style.viewType.toogle()
             self.style.viewType = toogleViewType
             self.headerView.style = style
+            
+            self.delegate?.calendar(self, didChangeViewType: viewType)
             
             if self.style.viewType == .month {
                 
@@ -272,7 +288,6 @@ extension CalendarView: CalendarHeaderDelegate {
                 guard let selectedDate = self.selectedDate else { return }
                 self.selectDate(selectedDate)
  
-                
             } else {
                 let displayDate: Date = {
                     guard let selectDate = self.selectedDate
@@ -290,7 +305,7 @@ extension CalendarView: CalendarHeaderDelegate {
                 guard let selectedDate = self.selectedDate else { return }
                 self.selectDate(selectedDate)
             }
-            self.delegate?.calendar(self, didChangeViewType: viewType)
+            
         case .left:
             handleLeftButtonAction()
         case .right:

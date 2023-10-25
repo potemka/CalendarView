@@ -30,6 +30,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var calendarView: CalendarView!
     @IBOutlet weak var datePicker: UIDatePicker!
     
+    @IBOutlet weak var calendarViewHeightConstraint: NSLayoutConstraint!
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -102,13 +104,14 @@ extension ViewController: CalendarViewDataSource {
           return twoYearsFromNow
     
       }
-    
 }
 
 // MARK: - CalendarViewDelegate (implementation)
 extension ViewController: CalendarViewDelegate {
     func calendar(_ calendar: CalendarView, didChangeViewType viewType: CalendarView.Style.CalendarViewType) {
         print("Calendar viewType did change: \(viewType == .month ? "month" : "week")")
+        
+        self.changeCalendarViewType(viewType)
     }
     
     
@@ -120,10 +123,19 @@ extension ViewController: CalendarViewDelegate {
        self.datePicker.setDate(date, animated: true)
    }
    
-   func calendar(_ calendar: CalendarView, didLongPressDate date : Date) {
-   }
+   func calendar(_ calendar: CalendarView, didLongPressDate date : Date) { }
 }
 
-
-
+private extension ViewController {
+    func changeCalendarViewType(_ viewType: CalendarView.Style.CalendarViewType) {
+        DispatchQueue.main.async { [weak self] in
+            guard let calendarView = self?.calendarView else { return }
+            
+            self?.calendarViewHeightConstraint?.constant = calendarView.style.calendarHeight
+            UIView.animate(withDuration: 0.2) {
+                self?.view.layoutIfNeeded()
+            }
+        }
+    }
+}
 

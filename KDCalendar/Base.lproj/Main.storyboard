@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -23,7 +23,7 @@
                                 <rect key="frame" x="16" y="36" width="343" height="343"/>
                                 <color key="backgroundColor" red="0.94004629629629632" green="0.80393518518518514" blue="0.87748842592592591" alpha="0.87" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="hW4-le-uM3" secondAttribute="height" id="773-eW-lgj"/>
+                                    <constraint firstAttribute="height" constant="343" id="Aqb-qr-smJ"/>
                                 </constraints>
                             </view>
                             <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" translatesAutoresizingMaskIntoConstraints="NO" id="ZI5-5E-Eq0">
@@ -45,6 +45,7 @@
                     </view>
                     <connections>
                         <outlet property="calendarView" destination="hW4-le-uM3" id="RAW-Yt-1by"/>
+                        <outlet property="calendarViewHeightConstraint" destination="Aqb-qr-smJ" id="7Yh-qR-c8M"/>
                         <outlet property="datePicker" destination="ZI5-5E-Eq0" id="TEh-9D-yoJ"/>
                     </connections>
                 </viewController>
