@@ -89,8 +89,6 @@ public class CalendarView: UIView {
         set {
             guard newValue != style.viewType else { return }
             self.style.viewType = newValue
-            
-            reloadData()
         }
     }
     
@@ -179,7 +177,6 @@ public class CalendarView: UIView {
         )
         
         flowLayout.itemSize = self.cellSize(in: self.bounds)
-        
         self.resetDisplayDate()
     }
     
@@ -200,7 +197,6 @@ public class CalendarView: UIView {
             return CGSize(width: width, height: style.weekdaysHeight)
             
             return CGSize(
-                
                 width:   collectionView.bounds.width / 7.0,                                    // number of days in week
                 height: (collectionView.bounds.height) / 6.0 // maximum number of rows
             )
@@ -337,7 +333,9 @@ extension CalendarView {
         else { return }
         
         self.collectionView?.reloadData()
-        self.collectionView?.setContentOffset(self.scrollViewOffset(for: date), animated: animated)
+        if viewType == .month {
+            self.collectionView?.setContentOffset(self.scrollViewOffset(for: date), animated: animated)
+        }
         self.displayDateOnHeader(date)
     }
     
@@ -353,6 +351,7 @@ extension CalendarView {
             self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
         } else {
             self.collectionView.reloadData()
+            self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
         }
        
 //        self.collectionView(collectionView, didSelectItemAt: indexPath)
@@ -417,8 +416,6 @@ private extension CalendarView {
         self.headerView.style = style
         self.headerView.delegate = self
         self.addSubview(self.headerView)
-        
-        self.headerView.backgroundColor = .red
         
         /* Layout */
         let layout = CalendarFlowLayout()

@@ -82,12 +82,12 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     }
     
     func updateAndNotifyScrolling() {
-        
-        guard let date = self.dateFromScrollViewPosition() else { return }
-        
-        self.displayDateOnHeader(date)
-        self.delegate?.calendar(self, didScrollToMonth: date)
-        
+        if viewType == .month {
+            guard let date = self.dateFromScrollViewPosition() else { return }
+            
+            self.displayDateOnHeader(date)
+            self.delegate?.calendar(self, didScrollToMonth: date)
+        }
     }
 
     @discardableResult
