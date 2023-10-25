@@ -61,6 +61,8 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
             return true
         } else if dateBeingSelected < Date() {
             return false
+        } else if dateBeingSelected > self.endDateCache {
+            return false
         }
         
         if let delegate = self.delegate {
