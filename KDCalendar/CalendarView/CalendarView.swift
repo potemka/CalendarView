@@ -329,8 +329,8 @@ extension CalendarView {
      function: - scroll calendar at date (month/year) passed as parameter.
      */
     public func setDisplayDate(_ date : Date, animated: Bool = false) {
-        guard (startDateCache..<endDateCache).contains(date)
-        else { return }
+//        guard (startDateCache..<endDateCache).contains(date)
+//        else { return }
         
         self.collectionView?.reloadData()
         if viewType == .month {
