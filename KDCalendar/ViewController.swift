@@ -107,6 +107,10 @@ extension ViewController: CalendarViewDataSource {
 
 // MARK: - CalendarViewDelegate (implementation)
 extension ViewController: CalendarViewDelegate {
+    func calendar(_ calendar: CalendarView, didChangeViewType viewType: CalendarView.Style.CalendarViewType) {
+        print("Calendar viewType did change: \(viewType == .month ? "month" : "week")")
+    }
+    
     
     func calendar(_ calendar: CalendarView, didSelectDate date : Date) {
         print("Did Select: \(date)")

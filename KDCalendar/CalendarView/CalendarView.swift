@@ -46,6 +46,7 @@ public protocol CalendarViewDelegate {
     
     func calendar(_ calendar : CalendarView, didScrollToMonth date : Date) -> Void
     func calendar(_ calendar : CalendarView, didSelectDate date : Date) -> Void
+    func calendar(_ calendar: CalendarView, didChangeViewType viewType: CalendarView.Style.CalendarViewType) -> Void
     /* optional */
     func calendar(_ calendar : CalendarView, canSelectDate date : Date) -> Bool
     func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void
@@ -289,6 +290,7 @@ extension CalendarView: CalendarHeaderDelegate {
                 guard let selectedDate = self.selectedDate else { return }
                 self.selectDate(selectedDate)
             }
+            self.delegate?.calendar(self, didChangeViewType: viewType)
         case .left:
             handleLeftButtonAction()
         case .right:
