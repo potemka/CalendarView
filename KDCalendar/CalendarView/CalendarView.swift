@@ -80,7 +80,7 @@ public class CalendarView: UIView {
     
     public var style: Style = Style.Default {
         didSet {
-            updateStyle()
+            self.headerView?.style = style
         }
     }
     
@@ -114,7 +114,6 @@ public class CalendarView: UIView {
     }
     
     public internal(set) var displayDate: Date?
-    public var multipleSelectionEnable = false
     
     // Delegates
     public var delegate: CalendarViewDelegate?
@@ -144,20 +143,6 @@ public class CalendarView: UIView {
         self.setupSubviews()
     }
     
-    @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
-        
-        guard gesture.state == UIGestureRecognizer.State.began
-        else { return }
-        
-        let point = gesture.location(in: collectionView)
-        
-        guard let indexPath = collectionView.indexPathForItem(at: point),
-            let date = self.dateFromIndexPath(indexPath)
-        else { return }
- 
-        self.delegate?.calendar(self, didLongPressDate: date)
-    }
-    
     override open func layoutSubviews() {
         
         super.layoutSubviews()
@@ -180,80 +165,7 @@ public class CalendarView: UIView {
         self.resetDisplayDate()
     }
     
-    private func cellSize(in bounds: CGRect) -> CGSize {
-        guard let collectionView = self.collectionView
-            else {
-                return .zero
-            }
-        switch viewType {
-        case .month:
-            return CGSize(
-                
-                width:   collectionView.bounds.width / 7.0,                                    // number of days in week
-                height: (collectionView.bounds.height) / 6.0 // maximum number of rows
-            )
-        case .week:
-            let width =  collectionView.bounds.width / 7.0
-            return CGSize(width: width, height: style.weekdaysHeight)
-            
-            return CGSize(
-                width:   collectionView.bounds.width / 7.0,                                    // number of days in week
-                height: (collectionView.bounds.height) / 6.0 // maximum number of rows
-            )
-        }
-   
-    }
-    
     internal var _isRtl = false
-    
-    internal func updateLayoutDirections() {
-        self.collectionView?.semanticContentAttribute = .forceLeftToRight
-        self.headerView?.semanticContentAttribute = forceLtr ? .forceLeftToRight : .unspecified
-        
-        var isRtl = false
-        
-        if !forceLtr {
-            isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
-            isRtl = self.effectiveUserInterfaceLayoutDirection == .rightToLeft
-        }
-        
-        if _isRtl != isRtl {
-            _isRtl = isRtl
-            
-            self.collectionView?.transform = isRtl
-                ? CGAffineTransform(scaleX: -1.0, y: 1.0)
-                : CGAffineTransform.identity
-            self.collectionView?.reloadData()
-        }
-    }
-    
-    internal func resetDisplayDate() {
-        guard let displayDate = self.displayDate else { return }
-        
-        self.collectionView.setContentOffset(
-            self.scrollViewOffset(for: displayDate),
-            animated: false
-        )
-    }
-    
-    internal func updateStyle() {
-        self.headerView?.style = style
-    }
-    
-    func scrollViewOffset(for date: Date) -> CGPoint {
-        var point = CGPoint.zero
-        
-        guard let sections = self.indexPathForDate(date)?.section else { return point }
-        
-        switch self.direction {
-        case .horizontal:   point.x = CGFloat(sections) * self.collectionView.frame.size.width
-        case .vertical:     point.y = CGFloat(sections) * self.collectionView.frame.size.height
-        @unknown default:
-            fatalError()
-        }
-        
-        return point
-    }
 }
 
 // MARK: - CalendarHeaderDelegate (implementation)
@@ -313,21 +225,10 @@ extension CalendarView: CalendarHeaderDelegate {
 // MARK: - Public methods
 extension CalendarView {
     
-    /*
-     method: - reloadData
-     function: - reload all components in collection view
-     */
     public func reloadData() {
         self.collectionView.reloadData()
     }
-    
-    /*
-     method: - setDisplayDate
-     params:
-     - date: Date to extract month and year to scroll at correct section;
-     - animated: to handle animation if want;
-     function: - scroll calendar at date (month/year) passed as parameter.
-     */
+
     public func setDisplayDate(_ date : Date, animated: Bool = false) {
 //        guard (startDateCache..<endDateCache).contains(date)
 //        else { return }
@@ -339,12 +240,6 @@ extension CalendarView {
         self.displayDateOnHeader(date)
     }
     
-    /*
-     method: - selectDate
-     params:
-     - date: Date to select;
-     function: - mark date as selected and add it to the array of selected dates
-     */
     public func selectDate(_ date : Date) {
         guard let indexPath = self.indexPathForDate(date) else { return }
         if viewType == .month {
@@ -357,30 +252,16 @@ extension CalendarView {
 //        self.collectionView(collectionView, didSelectItemAt: indexPath)
     }
     
-    /*
-     method: - deselectDate
-     params:
-     - date: Date to deselect;
-     function: - unmark date as selected and remove it from the array of selected dates
-     */
     public func deselectDate(_ date : Date) {
         guard let indexPath = self.indexPathForDate(date) else { return }
         self.collectionView.deselectItem(at: indexPath, animated: false)
 //        self.collectionView(collectionView, didSelectItemAt: indexPath)
     }
     
-    /*
-     method: - goToNextMonth
-     function: - scroll the calendar by one month in the future
-     */
     public func goToNextMonth() {
         goToMonthWithOffet(1)
     }
     
-    /*
-     method: - goToPreviousMonth
-     function: - scroll the calendar by one month in the past
-     */
     public func goToPreviousMonth() {
         goToMonthWithOffet(-1)
     }
@@ -393,10 +274,6 @@ extension CalendarView {
         goToWeekWithOffset(-1)
     }
 
-    /*
-     method: - clearAllSelectedDates
-     function: - clear all selected dates.  Does not call `didDeselectDate` callback
-     */
     public func clearAllSelectedDates() {
         self.selectedDate = nil
         self.reloadData()
@@ -444,6 +321,23 @@ private extension CalendarView {
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(CalendarView.handleLongPress))
         self.collectionView.addGestureRecognizer(longPress)
         
+    }
+}
+
+// MARK: - Handle long press recognizer (private)
+private extension CalendarView {
+    @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
+        
+        guard gesture.state == UIGestureRecognizer.State.began
+        else { return }
+        
+        let point = gesture.location(in: collectionView)
+        
+        guard let indexPath = collectionView.indexPathForItem(at: point),
+            let date = self.dateFromIndexPath(indexPath)
+        else { return }
+ 
+        self.delegate?.calendar(self, didLongPressDate: date)
     }
 }
 
@@ -541,6 +435,81 @@ extension CalendarView {
             return self.calendar.date(byAdding: components, to: self.firstDayCache)
         case .week:
             return cachedWeek[indexPath.row]
+        }
+    }
+}
+
+// MARK: - Get cell size (private)
+private extension CalendarView {
+    func cellSize(in bounds: CGRect) -> CGSize {
+        guard let collectionView = self.collectionView
+            else {
+                return .zero
+            }
+        switch viewType {
+        case .month:
+            return CGSize(
+                
+                width:   collectionView.bounds.width / 7.0,                                    // number of days in week
+                height: (collectionView.bounds.height) / 6.0 // maximum number of rows
+            )
+        case .week:
+            let width =  collectionView.bounds.width / 7.0
+            return CGSize(width: width, height: style.weekdaysHeight)
+        }
+    }
+}
+
+// MARK: - Reset display date (private)
+private extension CalendarView {
+    func resetDisplayDate() {
+        guard let displayDate = self.displayDate else { return }
+        
+        self.collectionView.setContentOffset(
+            self.scrollViewOffset(for: displayDate),
+            animated: false
+        )
+    }
+}
+
+// MARK: - Scroll view offset (private)
+private extension CalendarView {
+    func scrollViewOffset(for date: Date) -> CGPoint {
+        var point = CGPoint.zero
+        
+        guard let sections = self.indexPathForDate(date)?.section else { return point }
+        
+        switch self.direction {
+        case .horizontal:   point.x = CGFloat(sections) * self.collectionView.frame.size.width
+        case .vertical:     point.y = CGFloat(sections) * self.collectionView.frame.size.height
+        @unknown default:
+            fatalError()
+        }
+        
+        return point
+    }
+}
+
+// MARK: - Update layout directions (private)
+private extension CalendarView {
+    func updateLayoutDirections() {
+        self.collectionView?.semanticContentAttribute = .forceLeftToRight
+        self.headerView?.semanticContentAttribute = forceLtr ? .forceLeftToRight : .unspecified
+        
+        var isRtl = false
+        
+        if !forceLtr {
+            isRtl = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+            isRtl = self.effectiveUserInterfaceLayoutDirection == .rightToLeft
+        }
+        
+        if _isRtl != isRtl {
+            _isRtl = isRtl
+            
+            self.collectionView?.transform = isRtl
+                ? CGAffineTransform(scaleX: -1.0, y: 1.0)
+                : CGAffineTransform.identity
+            self.collectionView?.reloadData()
         }
     }
 }
