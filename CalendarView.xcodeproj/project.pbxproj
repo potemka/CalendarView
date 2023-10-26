@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5F9805E72AEAC9FF0045FD70 /* CalendarDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9805E62AEAC9FF0045FD70 /* CalendarDay.swift */; };
+		5F9805E82AEAC9FF0045FD70 /* CalendarDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9805E62AEAC9FF0045FD70 /* CalendarDay.swift */; };
 		ADC21D7F208C5DE400200022 /* CalendarView_iOS.h in Headers */ = {isa = PBXBuildFile; fileRef = ADC21D7D208C5DE400200022 /* CalendarView_iOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ADC21D82208C5DE400200022 /* CalendarView_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADC21D7B208C5DE400200022 /* CalendarView_iOS.framework */; };
 		ADC21D83208C5DE400200022 /* CalendarView_iOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = ADC21D7B208C5DE400200022 /* CalendarView_iOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -66,6 +68,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5F9805E62AEAC9FF0045FD70 /* CalendarDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDay.swift; sourceTree = "<group>"; };
 		ADC21D7B208C5DE400200022 /* CalendarView_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CalendarView_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADC21D7D208C5DE400200022 /* CalendarView_iOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CalendarView_iOS.h; sourceTree = "<group>"; };
 		ADC21D7E208C5DE400200022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -186,6 +189,7 @@
 		BEFD65741ACC074A00ADE917 /* CalendarView */ = {
 			isa = PBXGroup;
 			children = (
+				5F9805E62AEAC9FF0045FD70 /* CalendarDay.swift */,
 				C7C16A6F1CBBE536004DC8CF /* CalendarView.swift */,
 				FC3FB289200F912000469B6B /* CalendarView+Style.swift */,
 				C7C16A6C1CBBE536004DC8CF /* CalendarDayCell.swift */,
@@ -355,6 +359,7 @@
 				ADC21D8C208C5DED00200022 /* CalendarHeaderView.swift in Sources */,
 				ADC21D8B208C5DED00200022 /* CalendarFlowLayout.swift in Sources */,
 				ADC21D90208C5DEE00200022 /* CalendarView+Extensions.swift in Sources */,
+				5F9805E82AEAC9FF0045FD70 /* CalendarDay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +367,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F9805E72AEAC9FF0045FD70 /* CalendarDay.swift in Sources */,
 				FC3FB28A200F912000469B6B /* CalendarView+Style.swift in Sources */,
 				BEFD65571ACC072000ADE917 /* ViewController.swift in Sources */,
 				C7EF3F4A1F9F8DF800C2DF2D /* CalendarView+Extensions.swift in Sources */,
