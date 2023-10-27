@@ -290,17 +290,23 @@ private extension CalendarView {
 // MARK: - Handle long press recognizer (private)
 private extension CalendarView {
     @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
-//        
-//        guard gesture.state == UIGestureRecognizer.State.began
-//        else { return }
-//        
-//        let point = gesture.location(in: collectionView)
-//        
-//        guard let indexPath = collectionView.indexPathForItem(at: point),
-//            let date = self.dateFromIndexPath(indexPath)
-//        else { return }
-// 
-//        self.delegate?.calendar(self, didLongPressDate: date)
+        
+        guard gesture.state == UIGestureRecognizer.State.began
+        else { return }
+        
+        let point = gesture.location(in: collectionView)
+        
+        guard let indexPath = collectionView.indexPathForItem(at: point)
+        else { return }
+        
+        switch style.viewType {
+        case .month:
+            break
+        case .week:
+            let day = self.cachedWeek[indexPath.row]
+            self.delegate?.calendar(self, didLongPressDay: day)
+        }
+
     }
 }
 
@@ -442,11 +448,24 @@ private extension CalendarView {
 internal extension CalendarView {
     func validateIsActiveDay(by date: Date) -> Bool {
         guard let days = self.dataSource?.days(),
-                let day = days.first(where: { day in day.date == date })
+              let day = days.first(where: { day in
+                  calendar.isDate(day.date, equalTo: date, toGranularity: .day)
+              })
         else { return false }
         return day.isActive
     }
 }
+
+// MARK: - Calendar day by Date (internal)
+internal extension CalendarView {
+    func calendarDay(by date: Date) -> CalendarDay? {
+        guard let day = self.dataSource?.days().first(where: { day in
+            calendar.isDate(date, equalTo: day.date, toGranularity: .day)
+        }) else { return nil }
+        return day
+    }
+}
+
 
 // MARK: - Get day number (internal)
 internal extension CalendarView {
