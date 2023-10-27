@@ -62,35 +62,13 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        
-        switch viewType {
-        case .month:
-            return true
-        case .week:
-            let day = self.cachedWeek[indexPath.row]
-            let today = Date()
-            if calendar.isDateInToday(day.date) {
-                return day.isActive
-            } else if day.date < today {
-                return false
-            } else { return day.isActive}
-        }
-        
-//        guard let dateBeingSelected = self.dateFromIndexPath(indexPath) else { return false }
-//        
-//        if calendar.isDateInToday(dateBeingSelected) {
-//            return true
-//        } else if dateBeingSelected < Date() {
-//            return false
-//        } else if dateBeingSelected > self.endDateCache {
-//            return false
-//        }
-//        
-//        if let delegate = self.delegate {
-//            return delegate.calendar(self, canSelectDate: dateBeingSelected)
-//        }
-//   
-//        return true // default
+        guard let day = self.calendarDay(indexPath: indexPath) else { return false}
+        let today = Date()
+        if calendar.isDateInToday(day.date) {
+            return day.isActive
+        } else if day.date < today {
+            return false
+        } else { return day.isActive}
     }
     
     // MARK: UIScrollViewDelegate
