@@ -1,62 +1,26 @@
-/*
- * CalendarView.swift
- * Created by Michael Michailidis on 02/04/2015.
- * http://blog.karmadust.com/
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- */
 
 import UIKit
 
 // MARK: CalendarViewDataSource (protocol)
 public protocol CalendarViewDataSource {
-    func startDate() -> Date
-    func endDate() -> Date
-}
-
-extension CalendarViewDataSource {
-    
-    func startDate() -> Date {
-        return Date()
-    }
-    func endDate() -> Date {
-        return Date()
-    }
+    func days() -> [CalendarDay]
 }
 
 // MARK: - CalendarViewDelegate (protocol)
 public protocol CalendarViewDelegate {
     
-    func calendar(_ calendar : CalendarView, didScrollToMonth date : Date) -> Void
-    func calendar(_ calendar : CalendarView, didSelectDate date : Date) -> Void
+    func calendar(_ calendar : CalendarView, didScrollToMonth day : CalendarDay) -> Void
+    func calendar(_ calendar : CalendarView, didSelectDay day : CalendarDay) -> Void
     func calendar(_ calendar: CalendarView, didChangeViewType viewType: CalendarView.Style.CalendarViewType) -> Void
+    
     /* optional */
-    func calendar(_ calendar : CalendarView, canSelectDate date : Date) -> Bool
-    func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void
-    func calendar(_ calendar : CalendarView, didLongPressDate date : Date) -> Void
+    func calendar(_ calendar : CalendarView, didDeselectDay day : CalendarDay) -> Void
+    func calendar(_ calendar : CalendarView, didLongPressDay day : CalendarDay) -> Void
 }
 
 extension CalendarViewDelegate {
-    func calendar(_ calendar : CalendarView, canSelectDate date : Date) -> Bool { return true }
-    func calendar(_ calendar : CalendarView, didDeselectDate date : Date) -> Void { return }
-    func calendar(_ calendar : CalendarView, didLongPressDate date : Date) -> Void { return }
+    func calendar(_ calendar : CalendarView, didDeselectDay day : CalendarDay) -> Void { return }
+    func calendar(_ calendar : CalendarView, didLongPressDay day : CalendarDay) -> Void { return }
 }
 
 // MARK: - CalendarView
@@ -70,7 +34,7 @@ public class CalendarView: UIView {
     
     // MARK: - Public properties
     
-    public internal(set) var selectedDate: Date?
+    public internal(set) var selectedDay: CalendarDay?
     
     public var forceLtr: Bool = true {
         didSet {
@@ -96,18 +60,17 @@ public class CalendarView: UIView {
         return style.calendar
     }
 
-    internal var _startDateCache: Date?
-    internal var _endDateCache: Date?
-    internal var _firstDayCache: Date?
-    internal var _lastDayCache: Date?
-    internal var _currentWeekDay: Int?
+    internal var _startDayCache: CalendarDay?
+    internal var _endDayCache: CalendarDay?
+    internal var _firstDayCache: CalendarDay?
+    internal var _lastDayCache: CalendarDay?
     
-    internal var todayIndexPath : IndexPath?
-    internal var startIndexPath : IndexPath!
-    internal var endIndexPath   : IndexPath!
+//    internal var todayIndexPath : IndexPath?
+//    internal var startIndexPath : IndexPath!
+//    internal var endIndexPath   : IndexPath!
 
-    internal var _cachedMonthInfoForSection = [Int:(firstDay: Int, daysTotal: Int)]()
-    internal var _cachedWeek: [Date] = []
+    internal var _cachedMonth = [Int:(firstDay: Int, daysTotal: Int)]()
+    internal var _cachedWeek: [CalendarDay] = []
     
     var flowLayout: CalendarFlowLayout {
         return self.collectionView.collectionViewLayout as! CalendarFlowLayout
@@ -171,54 +134,54 @@ public class CalendarView: UIView {
 // MARK: - CalendarHeaderDelegate (implementation)
 extension CalendarView: CalendarHeaderDelegate {
     func calendarHeaderDidOccurAction(_ action: CalendarHeaderAction) {
-        switch action {
-            
-        case .down, .up:
-            let toogleViewType = self.style.viewType.toogle()
-            self.style.viewType = toogleViewType
-            self.headerView.style = style
-            
-            self.delegate?.calendar(self, didChangeViewType: viewType)
-            
-            if self.style.viewType == .month {
-                
-                let display: Date = {
-                    guard let selectDate = self.selectedDate
-                    else {
-                        guard let firstWeekdate = self.cachedWeek.first
-                        else { return Date() }
-                        return firstWeekdate
-                    }
-                    return selectDate
-                }()
-                self.setDisplayDate(display)
-                
-                guard let selectedDate = self.selectedDate else { return }
-                self.selectDate(selectedDate)
- 
-            } else {
-                let displayDate: Date = {
-                    guard let selectDate = self.selectedDate
-                    else {
-                        guard let displayDate = self.displayDate
-                        else { 
-                            return Date()
-                        }
-                        return displayDate
-                    }
-                    return selectDate
-                }()
-                self.setDisplayDate(displayDate)
-                
-                guard let selectedDate = self.selectedDate else { return }
-                self.selectDate(selectedDate)
-            }
-            
-        case .left:
-            handleLeftButtonAction()
-        case .right:
-            handleRightButtonAction()
-        }
+//        switch action {
+//            
+//        case .down, .up:
+//            let toogleViewType = self.style.viewType.toogle()
+//            self.style.viewType = toogleViewType
+//            self.headerView.style = style
+//            
+//            self.delegate?.calendar(self, didChangeViewType: viewType)
+//            
+//            if self.style.viewType == .month {
+//                
+//                let display: Date = {
+//                    guard let selectDate = self.selectedDate
+//                    else {
+//                        guard let firstWeekdate = self.cachedWeek.first
+//                        else { return Date() }
+//                        return firstWeekdate
+//                    }
+//                    return selectDate
+//                }()
+//                self.setDisplayDate(display)
+//                
+//                guard let selectedDate = self.selectedDate else { return }
+//                self.selectDate(selectedDate)
+// 
+//            } else {
+//                let displayDate: Date = {
+//                    guard let selectDate = self.selectedDate
+//                    else {
+//                        guard let displayDate = self.displayDate
+//                        else { 
+//                            return Date()
+//                        }
+//                        return displayDate
+//                    }
+//                    return selectDate
+//                }()
+//                self.setDisplayDate(displayDate)
+//                
+//                guard let selectedDate = self.selectedDate else { return }
+//                self.selectDate(selectedDate)
+//            }
+//            
+//        case .left:
+//            handleLeftButtonAction()
+//        case .right:
+//            handleRightButtonAction()
+//        }
     }
 }
 
@@ -275,8 +238,8 @@ extension CalendarView {
     }
 
     public func clearAllSelectedDates() {
-        self.selectedDate = nil
-        self.reloadData()
+//        self.selectedDate = nil
+//        self.reloadData()
     }
 }
 
@@ -327,17 +290,17 @@ private extension CalendarView {
 // MARK: - Handle long press recognizer (private)
 private extension CalendarView {
     @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
-        
-        guard gesture.state == UIGestureRecognizer.State.began
-        else { return }
-        
-        let point = gesture.location(in: collectionView)
-        
-        guard let indexPath = collectionView.indexPathForItem(at: point),
-            let date = self.dateFromIndexPath(indexPath)
-        else { return }
- 
-        self.delegate?.calendar(self, didLongPressDate: date)
+//        
+//        guard gesture.state == UIGestureRecognizer.State.began
+//        else { return }
+//        
+//        let point = gesture.location(in: collectionView)
+//        
+//        guard let indexPath = collectionView.indexPathForItem(at: point),
+//            let date = self.dateFromIndexPath(indexPath)
+//        else { return }
+// 
+//        self.delegate?.calendar(self, didLongPressDate: date)
     }
 }
 
@@ -365,77 +328,80 @@ private extension CalendarView {
 // MARK: - Go to month with offset (private)
 private extension CalendarView {
     func goToMonthWithOffet(_ offset: Int) {
-        guard let displayDate = self.displayDate else { return }
-        var dateComponents = DateComponents()
-        dateComponents.month = offset
-        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
-        self.setDisplayDate(newDate, animated: true)
-        
-        guard let selectedDate = self.selectedDate
-        else { return }
-        self.selectDate(selectedDate)
+//        guard let displayDate = self.displayDate else { return }
+//        var dateComponents = DateComponents()
+//        dateComponents.month = offset
+//        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
+//        self.setDisplayDate(newDate, animated: true)
+//        
+//        guard let selectedDate = self.selectedDate
+//        else { return }
+//        self.selectDate(selectedDate)
     }
 }
 
 // MARK: - Go to week with offset (private)
 private extension CalendarView {
     func goToWeekWithOffset(_ offset: Int) {
-        guard let displayDate = self.displayDate else { return }
-        var dateComponents = DateComponents()
-        dateComponents.weekOfYear = offset
-        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
-        
-        self.updateCachedWeek(by: newDate)
-        self.setDisplayDate(newDate, animated: true)
-        
-        guard let selectedDate = self.selectedDate
-        else { return }
-        self.selectDate(selectedDate)
+//        guard let displayDate = self.displayDate else { return }
+//        var dateComponents = DateComponents()
+//        dateComponents.weekOfYear = offset
+//        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
+//        
+//        self.updateCachedWeek(by: newDate)
+//        self.setDisplayDate(newDate, animated: true)
+//        
+//        guard let selectedDate = self.selectedDate
+//        else { return }
+//        self.selectDate(selectedDate)
     }
 }
 
 // MARK: - Update cached week (private)
 private extension CalendarView {
     func updateCachedWeek(by date: Date) {
-        _cachedWeek = Date.dates(from: date.startOfWeek(using: calendar), to: date.endOfWeek(using: calendar))
+//        _cachedWeek = Date.dates(from: date.startOfWeek(using: calendar), to: date.endOfWeek(using: calendar))
     }
 }
 
 // MARK: Convertions methods (private)
 extension CalendarView {
     func indexPathForDate(_ date : Date) -> IndexPath? {
-        switch style.viewType {
-        case .month:
-            let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.firstDayCache, to: date)
-            
-            guard let day = distanceFromStartDate.day,
-                  let month = distanceFromStartDate.month,
-                  let (firstDayIndex, _) = getCachedMonthSectionInfo(month)
-            else { return nil }
-            
-            return IndexPath(item: day + firstDayIndex, section: month)
-        case .week:
-            guard let index = cachedWeek.firstIndex(where: { $0 == date })
-            else { return nil }
-            return IndexPath(item: index, section: 0)
-        }
+//        switch style.viewType {
+//        case .month:
+//            let distanceFromStartDate = self.calendar.dateComponents([.month, .day], from: self.firstDayCache, to: date)
+//            
+//            guard let day = distanceFromStartDate.day,
+//                  let month = distanceFromStartDate.month,
+//                  let (firstDayIndex, _) = getCachedMonthSectionInfo(month)
+//            else { return nil }
+//            
+//            return IndexPath(item: day + firstDayIndex, section: month)
+//        case .week:
+//            guard let index = cachedWeek.firstIndex(where: { $0 == date })
+//            else { return nil }
+//            return IndexPath(item: index, section: 0)
+//        }
+        return nil
     }
     
     func dateFromIndexPath(_ indexPath: IndexPath) -> Date? {
-        switch style.viewType {
-        case .month:
-            let month = indexPath.section
-            
-            guard let monthInfo = getCachedMonthSectionInfo(month) else { return nil }
-            
-            var components      = DateComponents()
-            components.month    = month
-            components.day      = indexPath.item - monthInfo.firstDay
-            
-            return self.calendar.date(byAdding: components, to: self.firstDayCache)
-        case .week:
-            return cachedWeek[indexPath.row]
-        }
+//        switch style.viewType {
+//        case .month:
+//            let month = indexPath.section
+//            
+//            guard let monthInfo = getCachedMonthSectionInfo(month) else { return nil }
+//            
+//            var components      = DateComponents()
+//            components.month    = month
+//            components.day      = indexPath.item - monthInfo.firstDay
+//            
+//            return self.calendar.date(byAdding: components, to: self.firstDayCache)
+//        case .week:
+//            return cachedWeek[indexPath.row]
+//        }
+        
+        return nil
     }
 }
 
@@ -469,6 +435,24 @@ private extension CalendarView {
             self.scrollViewOffset(for: displayDate),
             animated: false
         )
+    }
+}
+
+// MARK: - Validate is active day by Date (internal)
+internal extension CalendarView {
+    func validateIsActiveDay(by date: Date) -> Bool {
+        guard let days = self.dataSource?.days(),
+                let day = days.first(where: { day in day.date == date })
+        else { return false }
+        return day.isActive
+    }
+}
+
+// MARK: - Get day number (internal)
+internal extension CalendarView {
+    func dayNumber(from day: CalendarDay) -> Int {
+        let dateComponents = calendar.dateComponents([.day], from: day.date)
+        return dateComponents.day!
     }
 }
 

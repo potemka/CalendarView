@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct CalendarDay {
+public struct CalendarDay {
     let date: Date
     let isActive: Bool
 }

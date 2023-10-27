@@ -1,27 +1,3 @@
-/*
- * CalendarDayCell.swift
- * Created by Michael Michailidis on 02/04/2015.
- * http://blog.karmadust.com/
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- */
 
 import UIKit
 
@@ -42,21 +18,6 @@ open class CalendarDayCell: UICollectionViewCell {
         }
     }
     
-    func updateTextColor() {
-        if isSelected {
-            self.textLabel.textColor = style.cellSelectedTextColor
-        }
-        else if isToday {
-            self.textLabel.textColor = style.cellTextColorToday
-        }
-        else if isOutOfRange {
-            self.textLabel.textColor = style.cellColorOutOfRange
-        }
-        else {
-            self.textLabel.textColor = style.cellTextColorDefault
-        }
-    }
-    
     var isToday : Bool = false {
         didSet {
             switch isToday {
@@ -68,11 +29,6 @@ open class CalendarDayCell: UICollectionViewCell {
             
             updateTextColor()
         }
-    }
-    
-    open override var isHidden: Bool {
-        get { self.containerView.isHidden }
-        set { self.containerView.isHidden = newValue }
     }
     
     var isOutOfRange : Bool = false {
@@ -179,6 +135,24 @@ private extension CalendarDayCell {
             self.bgView.layer.cornerRadius = elementsFrame.width * 0.5
         case .bevel(let radius):
             self.bgView.layer.cornerRadius = radius
+        }
+    }
+}
+
+// MARK: - Update text color (private)
+private extension CalendarDayCell {
+    func updateTextColor() {
+        if isSelected {
+            self.textLabel.textColor = style.cellSelectedTextColor
+        }
+        else if isToday {
+            self.textLabel.textColor = style.cellTextColorToday
+        }
+        else if isOutOfRange {
+            self.textLabel.textColor = style.cellColorOutOfRange
+        }
+        else {
+            self.textLabel.textColor = style.cellTextColorDefault
         }
     }
 }
