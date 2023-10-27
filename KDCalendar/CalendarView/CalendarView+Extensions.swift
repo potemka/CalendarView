@@ -39,17 +39,14 @@ extension Date {
         let delta = TimeInterval(toTimeZone.secondsFromGMT(for: self) - fromTimeZone.secondsFromGMT(for: self))
         return addingTimeInterval(delta)
     }
-    func startOfWeek(using calendar: Calendar, isFirstMonday: Bool = true) -> Date {
-        var dateCompomemnts = calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear, .day, .month], from: self)
-        if isFirstMonday {
-            dateCompomemnts.day! -= 1
-            return dateCompomemnts.date!
-        } else {
-            return dateCompomemnts.date!
-        }
-    }
+    
+    func startOfWeek(using calendar: Calendar) -> Date {
+          let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
+          return calendar.date(byAdding: .day, value: 1, to: sunday!)!
+      }
+    
     func endOfWeek(using calendar: Calendar, isFirstMonday: Bool = true) -> Date {
-        let startOfWeek = self.startOfWeek(using: calendar, isFirstMonday: isFirstMonday)
+        let startOfWeek = self.startOfWeek(using: calendar)
         return calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
     }
     static func dates(from fromDate: Date, to toDate: Date) -> [Date] {
