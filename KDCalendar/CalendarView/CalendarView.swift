@@ -482,6 +482,20 @@ internal extension CalendarView {
     }
 }
 
+internal extension CalendarView {
+    func calendarDay(indexPath: IndexPath) -> CalendarDay? {
+        switch viewType {
+        case .month:
+            guard let date = self.dateFromIndexPath(indexPath),
+                  let day = self.calendarDay(by: date)
+            else { return nil }
+            return day
+        case .week:
+            guard indexPath.row < self.cachedWeek.count - 1 else { return nil }
+            return self.cachedWeek[indexPath.row]
+        }
+    }
+}
 
 // MARK: - Get day number (internal)
 internal extension CalendarView {
