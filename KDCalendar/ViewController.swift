@@ -41,6 +41,8 @@ class ViewController: UIViewController {
         self.datePicker.locale = self.calendarView.style.locale
         self.datePicker.timeZone = self.calendarView.calendar.timeZone
         self.datePicker.setDate(today, animated: false)
+        
+        self.changeCalendarViewType(calendarView.viewType)
     }
     
     override var prefersStatusBarHidden: Bool {

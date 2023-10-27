@@ -5,6 +5,38 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+        switch viewType {
+        case .week:
+            var day = self.cachedWeek[indexPath.row]
+            day.isActive = !day.isActive
+            _cachedWeek[indexPath.row] = day
+            
+            // TODO: - Обновить данные для месяца?
+            if day.isActive {
+                self.selectedDay = day
+                self.delegate?.calendar(self, didSelectDay: day)
+            } else {
+                self.selectedDay = nil
+                self.delegate?.calendar(self, didDeselectDay: day)
+            }
+           
+        case .month:
+            guard let date = self.dateFromIndexPath(indexPath) else { return }
+    
+            if let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell, currentCell.isOutOfRange  {
+                return
+            }
+            
+    
+//            if let selectedDate = self.selectedDay?.date {
+//                self.selectedDay = nil
+//                if let selectedIndexPath = self.indexPathForDate(selectedDate) {
+//                    self.collectionView.deselectItem(at: selectedIndexPath, animated: false)
+//                }
+//            }
+            
+        }
+        
 //        guard let date = self.dateFromIndexPath(indexPath) else { return }
 //        
 //        if let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell, currentCell.isOutOfRange  {
@@ -31,6 +63,19 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         
+        switch viewType {
+        case .month:
+            return true
+        case .week:
+            let day = self.cachedWeek[indexPath.row]
+            let today = Date()
+            if calendar.isDateInToday(day.date) {
+                return day.isActive
+            } else if day.date < today {
+                return false
+            } else { return day.isActive}
+        }
+        
 //        guard let dateBeingSelected = self.dateFromIndexPath(indexPath) else { return false }
 //        
 //        if calendar.isDateInToday(dateBeingSelected) {
@@ -46,8 +91,6 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
 //        }
 //   
 //        return true // default
-        
-        return true
     }
     
     // MARK: UIScrollViewDelegate
@@ -95,18 +138,5 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
 //        return self.calendar.date(byAdding: monthsOffsetComponents, to: self.firstDayCache);
         
         return nil
-    }
-    
-    func displayDateOnHeader(_ date: Date) {
-//        let month = self.calendar.component(.month, from: date) // get month
-//        
-//        let formatter = DateFormatter()
-//        formatter.locale = style.locale
-//        formatter.timeZone = style.calendar.timeZone
-//        
-//        let monthName = formatter.standaloneMonthSymbols[(month-1) % 12].capitalized // 0 indexed array
-//
-//        self.headerView.monthTitle =  monthName
-//        self.displayDate = date
     }
 }

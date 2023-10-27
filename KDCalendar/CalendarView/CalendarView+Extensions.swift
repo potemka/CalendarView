@@ -21,10 +21,11 @@ extension Date {
           return calendar.date(byAdding: .day, value: 1, to: sunday!)!
       }
     
-    func endOfWeek(using calendar: Calendar, isFirstMonday: Bool = true) -> Date {
+    func endOfWeek(using calendar: Calendar) -> Date {
         let startOfWeek = self.startOfWeek(using: calendar)
         return calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
     }
+    
     static func dates(from fromDate: Date, to toDate: Date) -> [Date] {
         var dates: [Date] = []
         var date = fromDate
@@ -35,6 +36,24 @@ extension Date {
             date = newDate
         }
         return dates
+    }
+    
+    func getAllMonthDates(using calendar: Calendar) -> [Date] {
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: self)
+
+        let range = calendar.range(of: .day, in: .month, for: self)!
+        let numDays = range.count
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy MM dd"
+        formatter.timeZone = TimeZone(abbreviation: "GMT+0:00")
+        var arrDates = [Date]()
+        for day in 1...numDays {
+            let dateString = "\(dateComponents.year!) \(dateComponents.month!) \(day)"
+            if let date = formatter.date(from: dateString) {
+                arrDates.append(date)
+            }
+        }
+        return arrDates
     }
 }
 

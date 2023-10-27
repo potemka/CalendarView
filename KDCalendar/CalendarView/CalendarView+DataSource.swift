@@ -55,10 +55,13 @@ internal extension CalendarView {
         let startWeekDate = today.startOfWeek(using: calendar)
         let endWeekDate = today.endOfWeek(using: calendar)
         let dates = Date.dates(from: startWeekDate, to: endWeekDate)
-        return dates.map { date in
+        
+        let weekDays = dates.map { date in
             let isActiveDay = validateIsActiveDay(by: date)
             return CalendarDay(date: date, isActive: isActiveDay)
         }
+        _cachedWeek = weekDays
+        return weekDays
     }
 }
 
@@ -84,24 +87,9 @@ extension CalendarView: UICollectionViewDataSource {
             let startDateComponents = self.calendar.dateComponents([.era, .year, .month, .day], from: startDayCache.date)
             let endDateComponents = self.calendar.dateComponents([.era, .year, .month, .day], from: endDayCache.date)
             
-            let local = TimeZone(secondsFromGMT: TimeZone.current.secondsFromGMT())!
-            let today = Date().convertToTimeZone(from: self.calendar.timeZone, to: local)
-            
-            // Устанавливается todayIndexPath, нужно ли это?
-//            if (self.firstDayCache.date ... self.lastDayCache.date).contains(today) {
-//                
-//                let distanceFromTodayComponents = self.calendar.dateComponents([.month, .day], from: self.firstDayCache.date, to: today)
-//                
-//                self.todayIndexPath = IndexPath(item: distanceFromTodayComponents.day!, section: distanceFromTodayComponents.month!)
-//            }
-            
             // how many months should the whole calendar display?
             let numberOfMonths = self.calendar.dateComponents([.month], from: firstDayCache.date, to: lastDayCache.date).month!
             
-            // TODO: - Устанавливается startIndexPath и endIndexPath, разобраться для чего
-            // subtract one to include the day
-//            self.startIndexPath = IndexPath(item: startDateComponents.day! - 1, section: 0)
-//            self.endIndexPath = IndexPath(item: endDateComponents.day! - 1, section: numberOfMonths)
             
             // if we are for example on the same month and the difference is 0 we still need 1 to display it
             return numberOfMonths + 1
@@ -142,30 +130,34 @@ extension CalendarView: UICollectionViewDataSource {
 
 // MARK: - Get cached month section info (internal)
 internal extension CalendarView {
-    func getCachedMonthSectionInfo(_ section: Int) -> (firstDay: Int, daysTotal: Int)? {
-//        var result = _cachedMonthInfoForSection[section]
-//        
-//        if result != nil { return result! }
-//        
-//        var monthOffsetComponents = DateComponents()
-//        monthOffsetComponents.month = section
-//        
-//        let date = self.calendar.date(byAdding: monthOffsetComponents, to: firstDayCache)
-//        
-//        var firstWeekdayOfMonthIndex    = date == nil ? 0 : self.calendar.component(.weekday, from: date!)
-//        firstWeekdayOfMonthIndex       -= style.firstWeekday == .monday ? 1 : 0
-//        firstWeekdayOfMonthIndex        = (firstWeekdayOfMonthIndex + 6) % 7 // push it modularly to map it in the range 0 to 6
-//        
-//        guard let rangeOfDaysInMonth = date == nil ? nil : self.calendar.range(of: .day, in: .month, for: date!)
-//            else { return nil }
-//        
-//        result = (firstDay: firstWeekdayOfMonthIndex, daysTotal: rangeOfDaysInMonth.count)
-//        
-//        _cachedMonthInfoForSection[section] = result
-//        
-//        return result
+    func getCachedMonthSectionInfo(_ section: Int) -> (firstDay: Int, days: [CalendarDay])? {
         
-        return nil
+        var result = _cachedMonths[section]
+        if result != nil { return result! }
+        
+        var monthOffsetComponents = DateComponents()
+        monthOffsetComponents.month = section
+        
+        guard let date = self.calendar.date(byAdding: monthOffsetComponents, to: firstDayCache.date)
+        else { return nil }
+        
+        var firstWeekdayOfMonthIndex = self.calendar.component(.weekday, from: date)
+        firstWeekdayOfMonthIndex -= style.firstWeekday == .monday ? 1 : 0
+        firstWeekdayOfMonthIndex = (firstWeekdayOfMonthIndex + 6) % 7 // push it modularly to map it in the range 0 to 6
+        
+        guard let rangeOfDaysInMonth = self.calendar.range(of: .day, in: .month, for: date)
+        else { return nil }
+        
+        let monthDates = date.getAllMonthDates(using: calendar)
+        let monthDays = monthDates.map { date in
+            let isActive = self.validateIsActiveDay(by: date)
+            return CalendarDay(date: date, isActive: isActive)
+        }
+        result = (firstDay: firstWeekdayOfMonthIndex, days: monthDays)
+        
+        _cachedMonths[section] = result
+        
+        return result
     }
 }
 
@@ -206,11 +198,12 @@ private extension CalendarView {
 // MARK: - Configure month day cell (private)
 private extension CalendarView {
     func configureMonthDayCell(_ cell: CalendarDayCell, indexPath: IndexPath) {
-//        guard let (firstDayIndex, numberOfDaysTotal) = self.getCachedMonthSectionInfo(indexPath.section)
-//        else { return }
-//        
-//        let lastDayIndex = firstDayIndex + numberOfDaysTotal
-//        
+        guard let (firstDayIndex, days) = self.getCachedMonthSectionInfo(indexPath.section)
+        else { return }
+        
+        let lastDayIndex = firstDayIndex + days.count
+        
+        // Проверка пустых ячеек
 //        let cellOutOfRange = { (indexPath: IndexPath) -> Bool in
 //            
 //            var isOutOfRange = false
@@ -223,30 +216,31 @@ private extension CalendarView {
 //            }
 //            
 //            return isOutOfRange
-//            
 //        }
-//        
-//        let isSelected: Bool = {
-//            guard let selectedDate = self.selectedDate,
-//                  let date = self.dateFromIndexPath(indexPath)
-//            else { return false }
-//            return date == selectedDate
-//        }()
-//        
-//        let isInRange = (firstDayIndex..<lastDayIndex).contains(indexPath.item)
-//       
-//        let isPassedDate: Bool = {
-//            guard let date = self.dateFromIndexPath(indexPath)
-//            else { return false }
-//            if calendar.isDateInToday(date) {
-//                return false
-//            } else if date < Date() {
-//                return true
-//            }
-//            return false
-//        }()
-//        
-//        // the index of this cell is within the range of first and the last day of the month
+        
+        
+        let isInRange = (firstDayIndex..<lastDayIndex).contains(indexPath.item)
+        if isInRange {
+            let dayIndex = (indexPath.item - firstDayIndex)
+            let day = days[dayIndex]
+            cell.isHidden = false
+            cell.day = self.dayNumber(from: day)
+            
+            if calendar.isDateInToday(day.date) {
+                cell.isToday = true
+                cell.isOutOfRange = !day.isActive
+            } else if day.date < Date() {
+                cell.isOutOfRange = true
+            } else {
+                cell.isOutOfRange = !day.isActive
+            }
+           
+        } else {
+            cell.isHidden = true
+            cell.textLabel.text = ""
+        }
+        
+        // the index of this cell is within the range of first and the last day of the month
 //        if isInRange {
 //            cell.isHidden = false
 //            
@@ -265,9 +259,9 @@ private extension CalendarView {
 //        }
 //        
 //        guard !cell.isOutOfRange else { return  }
-//        
-//        // if is in range continue with additional styling
-//        
+        
+//         if is in range continue with additional styling
+        
 //        if let idx = self.todayIndexPath {
 //            cell.isToday = (idx.section == indexPath.section && idx.item + firstDayIndex == indexPath.item)
 //        }
@@ -287,7 +281,7 @@ private extension CalendarView {
         _firstDayCache = nil
         _lastDayCache = nil
         
-        _cachedMonth.removeAll()
+        _cachedMonths.removeAll()
         _cachedWeek.removeAll()
     }
 }

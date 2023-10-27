@@ -10,5 +10,5 @@ import Foundation
 
 public struct CalendarDay {
     let date: Date
-    let isActive: Bool
+    var isActive: Bool
 }
