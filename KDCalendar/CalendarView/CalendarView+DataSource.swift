@@ -183,10 +183,11 @@ private extension CalendarView {
             // Validate is active
             let today = Date()
             if day.date < today || day.date < self.startDayCache.date || day.date > self.endDayCache.date {
-                    let isActive = self.validateIsActiveDay(by: day.date)
-                    cell.isOutOfRange = isActive
+                cell.isOutOfRange = true
             } else {
-                cell.isOutOfRange = false
+                let isActive = self.validateIsActiveDay(by: day.date)
+                print("Is active: \(isActive)")
+                cell.isOutOfRange = !isActive
             }
             
             // Validate is selected
