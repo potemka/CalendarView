@@ -70,26 +70,16 @@ extension CalendarView: UICollectionViewDataSource {
   
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         
-        guard let dataSource = self.dataSource else { return 0 }
+        guard self.dataSource != nil else { return 0 }
         
         switch style.viewType {
         case .month:
-            
-            // Непонятная проверка - чего дает?
-//            if dataSource.startDate() != _startDateCache ||
-//                dataSource?.endDate() != _endDateCache {
-//                self.resetDateCaches()
-//            }
-            
+                        
             guard self.startDayCache.date <= self.endDayCache.date
             else { return 0 }
-
-            let startDateComponents = self.calendar.dateComponents([.era, .year, .month, .day], from: startDayCache.date)
-            let endDateComponents = self.calendar.dateComponents([.era, .year, .month, .day], from: endDayCache.date)
             
             // how many months should the whole calendar display?
             let numberOfMonths = self.calendar.dateComponents([.month], from: firstDayCache.date, to: lastDayCache.date).month!
-            
             
             // if we are for example on the same month and the difference is 0 we still need 1 to display it
             return numberOfMonths + 1
@@ -145,7 +135,7 @@ internal extension CalendarView {
         firstWeekdayOfMonthIndex -= style.firstWeekday == .monday ? 1 : 0
         firstWeekdayOfMonthIndex = (firstWeekdayOfMonthIndex + 6) % 7 // push it modularly to map it in the range 0 to 6
         
-        guard let rangeOfDaysInMonth = self.calendar.range(of: .day, in: .month, for: date)
+        guard self.calendar.range(of: .day, in: .month, for: date) != nil
         else { return nil }
         
         let monthDates = date.getAllMonthDates(using: calendar)
@@ -202,22 +192,6 @@ private extension CalendarView {
         else { return }
         
         let lastDayIndex = firstDayIndex + days.count
-        
-        // Проверка пустых ячеек
-//        let cellOutOfRange = { (indexPath: IndexPath) -> Bool in
-//            
-//            var isOutOfRange = false
-//            
-//            if self.startIndexPath.section == indexPath.section { // is 0
-//                isOutOfRange = self.startIndexPath.item + firstDayIndex > indexPath.item
-//            }
-//            if self.endIndexPath.section == indexPath.section && !isOutOfRange {
-//                isOutOfRange = self.endIndexPath.item + firstDayIndex < indexPath.item
-//            }
-//            
-//            return isOutOfRange
-//        }
-        
         
         let isInRange = (firstDayIndex..<lastDayIndex).contains(indexPath.item)
         if isInRange {

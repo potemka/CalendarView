@@ -265,7 +265,7 @@ private extension CalendarView {
         self.collectionView.backgroundColor     = UIColor.clear
         self.collectionView.showsHorizontalScrollIndicator  = false
         self.collectionView.showsVerticalScrollIndicator    = false
-        self.collectionView.allowsMultipleSelection         = true
+        self.collectionView.allowsMultipleSelection         = false 
         self.collectionView.isMultipleTouchEnabled = false
         self.collectionView.register(CalendarDayCell.self, forCellWithReuseIdentifier: cellReuseIdentifier)
         
@@ -491,7 +491,7 @@ internal extension CalendarView {
             else { return nil }
             return day
         case .week:
-            guard indexPath.row < self.cachedWeek.count - 1 else { return nil }
+            guard indexPath.row < self.cachedWeek.count else { return nil }
             return self.cachedWeek[indexPath.row]
         }
     }

@@ -5,19 +5,20 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+        let isNeedSelect = self.selectedDay == nil
+        
+        if let selectedDate = self.selectedDay?.date, let selectedIndexPath = self.indexPathForDate(selectedDate) {
+            self.selectedDay = nil
+            collectionView.deselectItem(at: selectedIndexPath, animated: false)
+        }
+        
         switch viewType {
         case .week:
-            var day = self.cachedWeek[indexPath.row]
-            day.isActive = !day.isActive
-            _cachedWeek[indexPath.row] = day
-            
-            // TODO: - Обновить данные для месяца?
-            if day.isActive {
+        
+            if isNeedSelect {
+                let day = self.cachedWeek[indexPath.row]
                 self.selectedDay = day
                 self.delegate?.calendar(self, didSelectDay: day)
-            } else {
-                self.selectedDay = nil
-                self.delegate?.calendar(self, didDeselectDay: day)
             }
            
         case .month:
@@ -26,15 +27,6 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
             if let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell, currentCell.isOutOfRange  {
                 return
             }
-            
-    
-//            if let selectedDate = self.selectedDay?.date {
-//                self.selectedDay = nil
-//                if let selectedIndexPath = self.indexPathForDate(selectedDate) {
-//                    self.collectionView.deselectItem(at: selectedIndexPath, animated: false)
-//                }
-//            }
-            
         }
         
 //        guard let date = self.dateFromIndexPath(indexPath) else { return }
