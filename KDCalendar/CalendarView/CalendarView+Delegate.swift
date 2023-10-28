@@ -12,45 +12,12 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
             collectionView.deselectItem(at: selectedIndexPath, animated: false)
         }
         
-        switch viewType {
-        case .week:
+        guard isNeedSelect, let selectedDay = self.calendarDay(indexPath: indexPath)
+        else { return }
         
-            if isNeedSelect {
-                let day = self.cachedWeek[indexPath.row]
-                self.selectedDay = day
-                self.delegate?.calendar(self, didSelectDay: day)
-            }
-           
-        case .month:
-            guard let date = self.dateFromIndexPath(indexPath) else { return }
-    
-            if let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell, currentCell.isOutOfRange  {
-                return
-            }
-        }
-        
-//        guard let date = self.dateFromIndexPath(indexPath) else { return }
-//        
-//        if let currentCell = collectionView.cellForItem(at: indexPath) as? CalendarDayCell, currentCell.isOutOfRange  {
-//            return
-//        }
-//        
-//        if let selectedDate = self.selectedDate {
-//            self.selectedDate = nil
-//            if let selectedIndexPath = self.indexPathForDate(selectedDate) {
-//                self.collectionView.deselectItem(at: selectedIndexPath, animated: false)
-//            }
-//        }
-//        
-//        self.selectedDate = date
-//        
-//        delegate?.calendar(self, didSelectDate: date)
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-//        guard let date = self.dateFromIndexPath(indexPath) else { return }
-//        self.selectedDate = nil
-//        delegate?.calendar(self, didDeselectDate: date)
+        self.selectedDay = selectedDay
+        self.delegate?.calendar(self, didSelectDay: selectedDay)
+  
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
