@@ -213,36 +213,6 @@ private extension CalendarView {
             cell.isHidden = true
             cell.textLabel.text = ""
         }
-        
-        // the index of this cell is within the range of first and the last day of the month
-//        if isInRange {
-//            cell.isHidden = false
-//            
-//            // ex. if the first is wednesday (index of 3), subtract 2 to show it as 1
-//            cell.day = (indexPath.item - firstDayIndex) + 1
-//            cell.isOutOfRange = cellOutOfRange(indexPath) || isPassedDate
-//            
-//        } else {
-//            cell.isHidden = true
-//            cell.textLabel.text = ""
-//        }
-//        
-//        // hack: send once at the beginning
-//        if indexPath.section == 0 && indexPath.item == 0 {
-//            self.scrollViewDidEndDecelerating(collectionView)
-//        }
-//        
-//        guard !cell.isOutOfRange else { return  }
-        
-//         if is in range continue with additional styling
-        
-//        if let idx = self.todayIndexPath {
-//            cell.isToday = (idx.section == indexPath.section && idx.item + firstDayIndex == indexPath.item)
-//        }
-//        
-//        if isSelected {
-//            cell.isSelected = true
-//        }
     }
 }
 
