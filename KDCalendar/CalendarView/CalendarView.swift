@@ -330,7 +330,7 @@ private extension CalendarView {
         guard let displayDate = self.displayDate else { return }
         var dateComponents = DateComponents()
         dateComponents.month = offset
-        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate), (self.startDayCache.date ... self.lastDayCache.date).contains(newDate)
+        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate), (self.firstDayCache.date ... self.lastDayCache.date).contains(newDate)
         else { return }
         
         self.setDisplayDate(newDate, animated: true)
@@ -349,7 +349,7 @@ private extension CalendarView {
         var dateComponents = DateComponents()
         dateComponents.weekOfYear = offset
         
-        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate), (self.startDayCache.date ... self.lastDayCache.date).contains(newDate)
+        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate), (self.firstDayCache.date ... self.lastDayCache.date).contains(newDate)
         else { return }
         
         self.updateCachedWeek(by: newDate)
