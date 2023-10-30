@@ -204,7 +204,6 @@ extension CalendarView {
         if viewType == .month {
             self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
         } else {
-            self.collectionView.reloadData()
             self.collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition())
         }
     }
