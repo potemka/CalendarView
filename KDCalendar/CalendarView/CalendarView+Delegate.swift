@@ -30,3 +30,53 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         } else { return day.isActive}
     }
 }
+
+extension CalendarView {
+    // MARK: UIScrollViewDelegate
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.updateAndNotifyScrolling()
+        
+    }
+    
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        self.updateAndNotifyScrolling()
+    }
+    
+    func updateAndNotifyScrolling() {
+        if viewType == .month {
+            guard let date = self.dateFromScrollViewPosition() else { return }
+            
+            self.displayDateOnHeader(date)
+            
+            guard let day = self.calendarDay(by: date) else { return }
+            self.delegate?.calendar(self, didScrollToMonth: day)
+        }
+    }
+    
+    
+    @discardableResult
+    func dateFromScrollViewPosition() -> Date? {
+        var page: Int = 0
+
+        switch self.direction {
+        case .horizontal:
+            let offsetX = ceilf(Float(self.collectionView.contentOffset.x))
+            let width = self.collectionView.bounds.size.width
+            page = Int(floor(offsetX / Float(width)))
+        case .vertical:
+            let offsetY = ceilf(Float(self.collectionView.contentOffset.y))
+            let height = self.collectionView.bounds.size.height
+            page = Int(floor(offsetY / Float(height)))
+        @unknown default:
+            fatalError()
+        }
+
+        page = page > 0 ? page : 0
+
+        var monthsOffsetComponents = DateComponents()
+        monthsOffsetComponents.month = page
+
+        return self.calendar.date(byAdding: monthsOffsetComponents, to: self.firstDayCache.date)
+    }
+}
