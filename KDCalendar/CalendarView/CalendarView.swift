@@ -161,11 +161,15 @@ extension CalendarView: CalendarHeaderDelegate {
                     else {
                         guard let displayDate = self.displayDate
                         else {  return Date() }
-                        return displayDate
+                        // Нужно чтобы первая неделя месяца была
+                        var displayDateComponents = calendar.dateComponents([.year, .month, .day], from: displayDate)
+                        displayDateComponents.day = 1
+                        return calendar.date(from: displayDateComponents)!
                     }
                     return selectDate
                 }()
                 self.setDisplayDate(displayDate)
+                self.updateCachedWeek(by: displayDate)
                 
                 guard let selectedDate = self.selectedDay?.date else { return }
                 self.selectDate(selectedDate)
