@@ -357,6 +357,9 @@ private extension CalendarView {
         guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate)
         else { return }
         
+        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate), (self.startDayCache.date ... self.lastDayCache.date).contains(newDate)
+        else { return }
+        
         self.updateCachedWeek(by: newDate)
         self.setDisplayDate(newDate, animated: true)
         
