@@ -159,12 +159,8 @@ extension CalendarView: CalendarHeaderDelegate {
                 let displayDate: Date = {
                     guard let selectDate = self.selectedDay?.date
                     else {
-                        guard let displayDate = self.displayDate
-                        else {  return Date() }
-                        // Нужно чтобы первая неделя месяца была
-                        var displayDateComponents = calendar.dateComponents([.year, .month, .day], from: displayDate)
-                        displayDateComponents.day = 1
-                        return calendar.date(from: displayDateComponents)!
+                        // Всегда возвращаем в Today
+                        return Date()
                     }
                     return selectDate
                 }()
@@ -193,8 +189,7 @@ extension CalendarView {
     }
 
     public func setDisplayDate(_ date : Date, animated: Bool = false) {
-//        guard (startDateCache..<endDateCache).contains(date)
-//        else { return }
+
         self.displayDate = date
         
         self.collectionView?.reloadData()
@@ -353,9 +348,6 @@ private extension CalendarView {
         
         var dateComponents = DateComponents()
         dateComponents.weekOfYear = offset
-        
-        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate)
-        else { return }
         
         guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate), (self.startDayCache.date ... self.lastDayCache.date).contains(newDate)
         else { return }
