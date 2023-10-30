@@ -334,7 +334,9 @@ private extension CalendarView {
         guard let displayDate = self.displayDate else { return }
         var dateComponents = DateComponents()
         dateComponents.month = offset
-        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate) else { return }
+        guard let newDate = self.calendar.date(byAdding: dateComponents, to: displayDate), (self.startDayCache.date ... self.lastDayCache.date).contains(newDate)
+        else { return }
+        
         self.setDisplayDate(newDate, animated: true)
         
         guard let selectedDate = self.selectedDay?.date
