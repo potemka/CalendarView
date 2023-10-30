@@ -17,8 +17,8 @@ extension Date {
     }
     
     func startOfWeek(using calendar: Calendar) -> Date {
-        let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))
-        let monday = calendar.date(byAdding: .day, value: 1, to: sunday!)!
+        let monday = calendar.date(from: calendar.dateComponents([.calendar, .yearForWeekOfYear, .weekOfYear], from: self))!
+        
         if self < monday {
             let prevMonday = calendar.date(byAdding: .day, value: -7, to: monday)!
             return prevMonday

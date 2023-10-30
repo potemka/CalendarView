@@ -115,8 +115,9 @@ extension CalendarView {
         
         //Calendar Identifier Style
         public lazy var calendar: Calendar   = {
-            var calendar = Calendar(identifier: .gregorian)
+            var calendar = Calendar(identifier: .iso8601)
             calendar.timeZone = TimeZone(abbreviation: "UTC")!
+            calendar.firstWeekday = 2
             return calendar
         }()
         

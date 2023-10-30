@@ -168,8 +168,9 @@ extension CalendarView: CalendarHeaderDelegate {
                     }
                     return selectDate
                 }()
-                self.setDisplayDate(displayDate)
                 self.updateCachedWeek(by: displayDate)
+                self.setDisplayDate(displayDate)
+             
                 
                 guard let selectedDate = self.selectedDay?.date else { return }
                 self.selectDate(selectedDate)
