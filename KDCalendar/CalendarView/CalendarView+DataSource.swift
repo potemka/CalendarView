@@ -213,6 +213,16 @@ private extension CalendarView {
             cell.isHidden = true
             cell.textLabel.text = ""
         }
+        
+        // Validate is selected
+        guard let selectedDay = self.selectedDay,
+              let day = self.calendarDay(indexPath: indexPath),
+              selectedDay.date == day.date
+        else {
+            cell.isSelected = false
+            return
+        }
+        cell.isSelected = true
     }
 }
 
