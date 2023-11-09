@@ -165,7 +165,7 @@ private extension CalendarView {
         } else {
             // Validate is active
             let today = Date()
-            if day.date < today || day.date < self.startDayCache.date || day.date > self.endDayCache.date {
+            if day.date < today {
                 cell.isOutOfRange = true
             } else {
                 let isActive = self.validateIsActiveDay(by: day.date)
