@@ -61,6 +61,7 @@ internal extension CalendarView {
             return CalendarDay(date: date, isActive: isActiveDay)
         }
         _cachedWeek = weekDays
+        self.setDisplayDate(today)
         return weekDays
     }
 }
