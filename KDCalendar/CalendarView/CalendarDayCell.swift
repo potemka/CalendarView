@@ -48,7 +48,6 @@ open class CalendarDayCell: UICollectionViewCell {
     
     override open var isSelected : Bool {
         didSet {
-            print("isSelected cell: \(isSelected)")
             switch isSelected {
             case true:
                 self.bgView.layer.borderColor = style.cellSelectedBorderColor.cgColor

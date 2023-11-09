@@ -5,19 +5,27 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let isNeedSelect = self.selectedDay == nil
+        guard let day = self.calendarDay(indexPath: indexPath) else { return }
         
-        if let selectedDate = self.selectedDay?.date, let selectedIndexPath = self.indexPathForDate(selectedDate) {
+        let isNeedSelect: Bool = {
+            guard let selectedDay = self.selectedDay else { return true }
+            return day.date != selectedDay.date
+        }()
+        
+        
+        if let selectedDate = self.selectedDay?.date,
+           let selectedIndexPath = self.indexPathForDate(selectedDate) {
             self.selectedDay = nil
             collectionView.deselectItem(at: selectedIndexPath, animated: false)
         }
         
-        guard isNeedSelect, let selectedDay = self.calendarDay(indexPath: indexPath)
-        else { return }
-        
-        self.selectedDay = selectedDay
-        self.delegate?.calendar(self, didSelectDay: selectedDay)
-  
+        if isNeedSelect {
+            self.selectedDay = day
+            self.delegate?.calendar(self, didSelectDay: day)
+        } else {
+            self.selectedDay = nil
+            self.delegate?.calendar(self, didDeselectDay: day)
+        }
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {

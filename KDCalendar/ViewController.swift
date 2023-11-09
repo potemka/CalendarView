@@ -89,6 +89,10 @@ extension ViewController: CalendarViewDelegate {
     func calendar(_ calendar: CalendarView, didSelectDay day: CalendarDay) {
         print("Did Select: \(day.date)")
     }
+    
+    func calendar(_ calendar: CalendarView, didDeselectDay day: CalendarDay) {
+        
+    }
 }
 
 // MARK: - Generate Start/end dates (private)

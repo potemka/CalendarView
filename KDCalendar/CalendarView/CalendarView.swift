@@ -19,7 +19,6 @@ public protocol CalendarViewDelegate {
 }
 
 extension CalendarViewDelegate {
-    func calendar(_ calendar : CalendarView, didDeselectDay day : CalendarDay) -> Void { return }
     func calendar(_ calendar : CalendarView, didLongPressDay day : CalendarDay) -> Void { return }
 }
 
@@ -227,11 +226,6 @@ extension CalendarView {
     
     public func goToPrevWeek() {
         goToWeekWithOffset(-1)
-    }
-
-    public func clearAllSelectedDates() {
-        self.selectedDay = nil
-        self.reloadData()
     }
 }
 
