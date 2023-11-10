@@ -12,3 +12,11 @@ public struct CalendarDay {
     let date: Date
     var isActive: Bool
 }
+
+extension CalendarDay: Equatable {
+    public static func == (lhs: CalendarDay, rhs: CalendarDay) -> Bool {
+        (lhs.date == rhs.date)
+    }
+}
+
+
