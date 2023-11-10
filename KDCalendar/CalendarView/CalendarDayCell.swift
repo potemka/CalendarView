@@ -144,11 +144,10 @@ private extension CalendarDayCell {
         if isSelected {
             self.textLabel.textColor = style.cellSelectedTextColor
         }
-        else if isToday {
-            self.textLabel.textColor = style.cellTextColorToday
-        }
         else if isOutOfRange {
             self.textLabel.textColor = style.cellColorOutOfRange
+        } else if isToday {
+            self.textLabel.textColor = style.cellTextColorToday
         }
         else {
             self.textLabel.textColor = style.cellTextColorDefault
