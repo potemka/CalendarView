@@ -9,7 +9,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         
         let isNeedSelect: Bool = {
             guard let selectedDay = self.selectedDay else { return true }
-            return day.date != selectedDay.date
+            return day != selectedDay
         }()
         
         

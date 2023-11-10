@@ -15,7 +15,7 @@ public struct CalendarDay {
 
 extension CalendarDay: Equatable {
     public static func == (lhs: CalendarDay, rhs: CalendarDay) -> Bool {
-        (lhs.date == rhs.date)
+        Calendar.current.isDate(lhs.date, equalTo: rhs.date, toGranularity: .day)
     }
 }
 
