@@ -162,6 +162,7 @@ private extension CalendarView {
         
         if calendar.isDateInToday(day.date) {
             cell.isToday = true
+            cell.isOutOfRange = !self.validateIsActiveDay(by: day.date)
         } else {
             // Validate is active
             let today = Date()
