@@ -129,7 +129,7 @@ private extension ViewController {
         DispatchQueue.main.async { [weak self] in
             guard let calendarView = self?.calendarView else { return }
             
-            self?.calendarViewHeightConstraint?.constant = calendarView.style.calendarHeight
+            self?.calendarViewHeightConstraint?.constant = calendarView.calendarHeight
             UIView.animate(withDuration: 0.2) {
                 self?.view.layoutIfNeeded()
             }

@@ -84,6 +84,27 @@ public class CalendarView: UIView {
         }
     }
     
+    public var calendarHeight: CGFloat {
+        switch viewType {
+        case .month:
+            if let displayDate = self.displayDate,
+               let range = calendar.range(of: .day, in: .month, for: displayDate),
+               let firstDayDate = calendar.date(byAdding: .month, value: 0, to: displayDate){
+                let dayInMountds = range.count
+                let firstDayComponents = calendar.dateComponents([.weekday], from: firstDayDate)
+                let freeDays = 5*7 - dayInMountds - firstDayComponents.weekday! - 1
+                if freeDays > 0 {
+                    return style.headerHeight + style.headerTopMargin + 5*style.weekdaysHeight
+                }
+                return style.headerHeight + style.headerTopMargin + 6*style.weekdaysHeight
+            } else {
+                return style.headerHeight + style.headerTopMargin + 6*style.weekdaysHeight
+            }
+        case .week:
+            return style.headerHeight + style.headerTopMargin + style.weekdaysHeight
+        }
+    }
+    
     // MARK: Life cycle
     
     override init(frame: CGRect) {
