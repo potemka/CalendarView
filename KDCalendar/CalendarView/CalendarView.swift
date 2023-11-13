@@ -381,7 +381,9 @@ extension CalendarView {
             
             return IndexPath(item: day + firstDayIndex, section: month)
         case .week:
-            guard let index = cachedWeek.firstIndex(where: { $0.date == date })
+            guard let index = cachedWeek.firstIndex(where: {
+                calendar.isDate(date, equalTo: $0.date, toGranularity: .day)
+            })
             else { return nil }
             return IndexPath(item: index, section: 0)
         }
